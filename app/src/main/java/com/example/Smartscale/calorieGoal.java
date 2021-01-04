@@ -13,14 +13,13 @@ import java.lang.Object;
 
 public class calorieGoal extends AppCompatActivity {
     SharedPreferences sharedpreferences;
-    int calGoal;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_calorie_goal);
         sharedpreferences = getSharedPreferences("MyPREFERENCES", Context.MODE_PRIVATE);
-        calGoal = sharedpreferences.getInt("calGoal",69);
+        int calGoal = sharedpreferences.getInt("calGoal",2000);
         EditText editText = (EditText) findViewById(R.id.editText2);
         editText.setText(Integer.toString(calGoal));
     }
@@ -29,6 +28,8 @@ public class calorieGoal extends AppCompatActivity {
     {
         Intent intent = new Intent(this, MainActivity.class);
         SharedPreferences.Editor editor = sharedpreferences.edit();
+        EditText editText = (EditText) findViewById(R.id.editText2);
+        int calGoal = Integer.parseInt(editText.getText().toString());
         editor.putInt("calGoal",calGoal);
         editor.commit();
         startActivity(intent);
