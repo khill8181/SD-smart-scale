@@ -11,6 +11,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.os.Bundle;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.view.MenuItem;
@@ -34,13 +35,14 @@ public class MainActivity extends AppCompatActivity {
         int calGoal = sharedpreferences.getInt("calGoal",2000);
         TextView text = (TextView) findViewById(R.id.textView3);
         text.setText(Integer.toString(calGoal));
-
         SQLiteOpenHelper smartscaleDBHelper = new SmartscaleDatabaseHelper(this);
+        ListView list = (ListView) findViewById(R.id.listView);
+
         try{
             db = smartscaleDBHelper.getReadableDatabase();
             cursor = db.query("FOODLOG", new String[] {"_id","FOOD","DATE",
                     "WEIGHT", "CALORIES"},null,null,null,null,null);
-            /*if (cursor.moveToFirst()){
+      /*      if (cursor.moveToFirst()){
                 String food = cursor.getString(1);
                 TextView dbText = (TextView) findViewById(R.id.textView4);
                 dbText.setText(food);
@@ -52,8 +54,6 @@ public class MainActivity extends AppCompatActivity {
 
         //FoodLogCursorAdapter adapter = new FoodLogCursorAdapter(this, cursor);
 
-
-            ListView list = (ListView) findViewById(R.id.listView);
             list.setAdapter(adapter);
         }
         catch(SQLiteException e){
@@ -61,6 +61,24 @@ public class MainActivity extends AppCompatActivity {
                     "DB unavailable", Toast.LENGTH_SHORT);
             toast.show();
         }
+
+        //Create the listener
+        AdapterView.OnItemClickListener itemClickListener =
+                new AdapterView.OnItemClickListener(){
+                    @Override
+                    public void onItemClick(AdapterView<?> list,
+                                            View itemView,
+                                            int position,
+                                            long id) {
+                        //Pass the drink the user clicks on to DrinkActivity
+                        Intent intent = new Intent(MainActivity.this, DeleteDailyEntry.class);
+                        intent.putExtra("id", (int) id);
+                        startActivity(intent);
+                    }
+                };
+
+        //Assign the listener to the list view
+        list.setOnItemClickListener(itemClickListener);
     }
 
     @Override
@@ -73,6 +91,12 @@ public class MainActivity extends AppCompatActivity {
     public void changeGoal(View view)
     {
         Intent intent = new Intent(this, calorieGoal.class);
+        startActivity(intent);
+    }
+
+    public void insertDailyEntry(View view)
+    {
+        Intent intent = new Intent(this, InsertDailyEntry.class);
         startActivity(intent);
     }
 /*

@@ -23,8 +23,10 @@ public class SmartscaleDatabaseHelper extends SQLiteOpenHelper {
                     + "DATE TEXT, "
                     + "WEIGHT REAL, "
                     + "CALORIES INTEGER);");
-        insertEntry(db, "pork rinds", 3.3, 105);
 
+        insertEntry(db, "balls", 3.3, 5);
+        insertEntry(db, "bacon", 3.3, 1005);
+        insertEntry(db, "bread", 3.3, 545);
 
 
     }
@@ -35,7 +37,7 @@ public class SmartscaleDatabaseHelper extends SQLiteOpenHelper {
     }
 
 
-    private static void insertEntry(SQLiteDatabase db,
+    public static void insertEntry(SQLiteDatabase db,
                                     String food,
                                     double mass,
                                     int calories) {

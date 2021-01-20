@@ -7,11 +7,14 @@
         android:id="@+id/food"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textSize="28dip" />
+        android:textSize="28dip"
+         />
     <TextView
         android:id="@+id/calories"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textSize="28dip" />
+        android:textSize="28dip"
+        android:layout_marginLeft="30dp"
+        />
 </LinearLayout>
 

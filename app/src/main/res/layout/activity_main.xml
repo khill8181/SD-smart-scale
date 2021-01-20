@@ -16,7 +16,7 @@
         android:onClick="changeGoal"
         android:text="Set calorie goal"
         app:layout_constraintEnd_toEndOf="parent"
-        tools:layout_editor_absoluteY="35dp" />
+        app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
         android:id="@+id/textView3"
@@ -25,24 +25,39 @@
         android:textSize="24sp"
         app:layout_constraintEnd_toStartOf="@+id/button2"
         app:layout_constraintStart_toStartOf="parent"
-        tools:layout_editor_absoluteY="31dp" />
+        app:layout_constraintTop_toTopOf="parent" />
 
     <ListView
         android:id="@+id/listView"
-        android:layout_width="420dp"
-        android:layout_height="569dp"
-        tools:layout_editor_absoluteX="-7dp"
-        tools:layout_editor_absoluteY="162dp" />
+        android:layout_width="328dp"
+        android:layout_height="385dp"
+        android:layout_marginStart="48dp"
+        android:layout_marginLeft="48dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
 
     <TextView
         android:id="@+id/textView4"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginStart="36dp"
+        android:layout_marginLeft="36dp"
         android:layout_marginTop="16dp"
         android:text="TextView"
         android:textSize="24sp"
         app:layout_constraintBottom_toTopOf="@+id/listView"
-        app:layout_constraintTop_toBottomOf="@+id/button2"
-        tools:layout_editor_absoluteX="185dp" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/button2" />
+
+    <Button
+        android:id="@+id/button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:onClick="insertDailyEntry"
+        android:text="Add_food_log"
+        app:layout_constraintBottom_toTopOf="@+id/listView"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/textView4"
+        app:layout_constraintTop_toBottomOf="@+id/button2" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
