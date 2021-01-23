@@ -1,9 +1,10 @@
 package com.example.Smartscale;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
@@ -12,11 +13,8 @@ import android.database.sqlite.SQLiteException;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.os.Bundle;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.ListView;
-import android.view.MenuItem;
 import android.view.View;
-import android.widget.EditText;
 import android.widget.SimpleCursorAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -52,7 +50,6 @@ public class MainActivity extends AppCompatActivity {
                     new String[] {"FOOD","CALORIES"},
                     new int[] {R.id.food, R.id.calories}, 0);
 
-        //FoodLogCursorAdapter adapter = new FoodLogCursorAdapter(this, cursor);
 
             list.setAdapter(adapter);
         }
@@ -96,8 +93,28 @@ public class MainActivity extends AppCompatActivity {
 
     public void insertDailyEntry(View view)
     {
-        Intent intent = new Intent(this, InsertDailyEntry.class);
+        Intent intent = new Intent(MainActivity.this, chooseFood.class);
         startActivity(intent);
+        /* AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Choose entry type")
+                .setItems(new String[] {"individual item","proportioned combo"}, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        // The 'which' argument contains the index position
+                        // of the selected item
+                        if (which == 0)
+                        {
+                            intent.putExtra("isCounted", true);
+                            startActivity(intent);
+                        }
+                        if (which == 1)
+                        {
+                            intent.putExtra("isCounted", false);
+                            startActivity(intent);
+                        }
+                        if (which == 2) {}
+                    }})
+                .show();*/
+
     }
 /*
     public boolean onOptionsItemSelected(MenuItem item) {

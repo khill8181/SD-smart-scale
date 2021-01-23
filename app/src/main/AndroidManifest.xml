@@ -9,8 +9,9 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.MyFirstApp">
-        <activity android:name=".DeleteDailyEntry"></activity>
-        <activity android:name=".InsertDailyEntry" />
+        <activity android:name=".addDailyEntry"></activity>
+        <activity android:name=".DeleteDailyEntry" />
+        <activity android:name=".chooseFood" />
         <activity android:name=".calorieGoal" />
         <activity
             android:name=".DisplayMessageActivity"
