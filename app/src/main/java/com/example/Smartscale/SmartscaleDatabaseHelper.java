@@ -6,9 +6,11 @@ import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 
 import java.sql.Date;
+import java.util.Calendar;
 
 public class SmartscaleDatabaseHelper extends SQLiteOpenHelper {
 
+    static Calendar date;
     private static final String DB_NAME = "smartScale";
     private static final int DB_VERSION = 1;
     SmartscaleDatabaseHelper(Context context){
@@ -17,20 +19,24 @@ public class SmartscaleDatabaseHelper extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase db){
-        db.execSQL("CREATE TABLE FOODLOG ("
+        db.execSQL("CREATE TABLE Foodlog ("
                     + "_id INTEGER PRIMARY KEY AUTOINCREMENT, "
-                    + "FOOD TEXT, "
-                    + "DATE TEXT, "
-                    + "WEIGHT REAL, "
-                    + "CALORIES INTEGER);");
+                    + "food TEXT, "
+                    + "date TEXT, "
+                    + "mass text, "
+                    + "calories text);");
 
         db.execSQL("CREATE TABLE Foodlist ("
                 +"_id integer primary key autoincrement, "
                 +"food text, "
-                +"weight real, "
+                +"mass real, "
                 +"calories real, "
                 +"countable integer);");
         insertNewFood(db, "popcorn", 1.2,5.6,0);
+        insertNewFood(db, "popcorn", 1.2,5.6,0);
+        insertNewFood(db, "popcorn", 1.2,5.6,0);
+        insertNewFood(db, "popcorn", 1.2,5.6,0);
+
 
     }
 
@@ -41,16 +47,14 @@ public class SmartscaleDatabaseHelper extends SQLiteOpenHelper {
     //daily entry
     public static void insertEntry(SQLiteDatabase db,
                                     String food,
-                                    double mass,
-                                    int calories) {
-        long millis=System.currentTimeMillis();
-        java.sql.Date currentDate=new java.sql.Date(millis);
+                                    String mass,
+                                    String calories) {
         ContentValues entryValues = new ContentValues();
-        entryValues.put("FOOD", food);
-        entryValues.put("DATE", currentDate.toString());
-        entryValues.put("WEIGHT", mass);
-        entryValues.put("CALORIES", calories);
-        db.insert("FOODLOG", null, entryValues);
+        entryValues.put("food", food);
+        entryValues.put("date", MainActivity.createDateString(date,true));
+        entryValues.put("mass", mass);
+        entryValues.put("calories", calories);
+        db.insert("Foodlog", null, entryValues);
     }
 
     //food table
@@ -61,7 +65,7 @@ public class SmartscaleDatabaseHelper extends SQLiteOpenHelper {
                                    int countable) {
         ContentValues entryValues = new ContentValues();
         entryValues.put("food", food);
-        entryValues.put("weight", mass);
+        entryValues.put("mass", mass);
         entryValues.put("calories", calories);
         entryValues.put("countable", countable);
         db.insert("Foodlist", null, entryValues);

@@ -28,10 +28,9 @@ public class DeleteDailyEntry extends AppCompatActivity {
         SQLiteDatabase db = smartscaleDBHelper.getReadableDatabase();
         Intent intent = getIntent();
         int intNum = intent.getIntExtra("id", 0);
-        db.delete("FOODLOG","_id = ?", new String[] {Integer.toString(intNum)} );
+        db.delete("Foodlog","_id = ?", new String[] {Integer.toString(intNum)} );
         Intent leaveIntent = new Intent(this, MainActivity.class);
         startActivity(leaveIntent);
     }
-
 
 }

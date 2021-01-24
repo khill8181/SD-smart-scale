@@ -1,5 +1,5 @@
 package com.example.Smartscale;
-//InsertDailyEntry was changed to chooseFood
+
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -10,24 +10,32 @@ import android.database.sqlite.SQLiteOpenHelper;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
 
 public class chooseFood extends AppCompatActivity {
     private SQLiteDatabase db;
     private Cursor cursor;
+    SimpleCursorAdapter adapter;
+    ListView list;
+    Bundle selectedFoods;
+    Button submitFoodChoices;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_choose_food);
-        ListView list = (ListView) findViewById(R.id.foodList);
+        setContentView(R.layout.activity_choose_food2);
+        submitFoodChoices = (Button) findViewById(R.id.submitCombo);
+        submitFoodChoices.setVisibility(View.GONE);
+        list = (ListView) findViewById(R.id.foodList);
         SQLiteOpenHelper smartscaleDBHelper = new SmartscaleDatabaseHelper(this);
         db = smartscaleDBHelper.getReadableDatabase();
         cursor = db.query("Foodlist", new String[] {"_id","food",
-                "weight", "calories", "countable"},null,null,null,null,null);
+                "mass", "calories", "countable"},null,null,null,null,null);
 
-        SimpleCursorAdapter adapter = new SimpleCursorAdapter(this, R.layout.food_log_item ,cursor,
+        adapter = new SimpleCursorAdapter(this, R.layout.food_log_item ,cursor,
                 new String[] {"food","calories"},
                 new int[] {R.id.food, R.id.calories}, 0);
 
@@ -51,6 +59,41 @@ public class chooseFood extends AppCompatActivity {
         //Assign the listener to the list view
         list.setOnItemClickListener(itemClickListener);
 
+    }
+
+    public void proportionedFoodSelection(View view)
+    {
+        submitFoodChoices.setVisibility(view.VISIBLE);
+        selectedFoods = new Bundle();
+        adapter = new SimpleCursorAdapter(this, R.layout.proportion_food_choice ,cursor,
+                new String[] {"food","calories"},
+                new int[] {R.id.food, R.id.calories}, 0);
+        list.setAdapter(adapter);
+        //Create the listener
+        AdapterView.OnItemClickListener itemClickListener =
+                new AdapterView.OnItemClickListener(){
+                    @Override
+                    public void onItemClick(AdapterView<?> list,
+                                            View itemView,
+                                            int position,
+                                            long id) {
+                        //Pass the drink the user clicks on to DrinkActivity
+                        //Intent intent = new Intent(chooseFood.this, addDailyEntry.class);
+                        CheckBox box = (CheckBox) itemView.findViewById(R.id.checkBox);
+                        if (box.isChecked()) selectedFoods.putLong(Long.toString(id),id);
+                        else selectedFoods.remove(Long.toString(id));
+                    }
+                };
+
+        //Assign the listener to the list view
+        list.setOnItemClickListener(itemClickListener);
+    }
+
+    public void submitSelections(View view)
+    {
+        Intent intent = new Intent(this, choosingProportions.class);
+        intent.putExtra("theBundle",selectedFoods);
+        startActivity(intent);
     }
 
     @Override
