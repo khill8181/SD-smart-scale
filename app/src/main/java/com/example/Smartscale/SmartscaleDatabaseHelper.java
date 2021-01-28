@@ -29,13 +29,13 @@ public class SmartscaleDatabaseHelper extends SQLiteOpenHelper {
         db.execSQL("CREATE TABLE Foodlist ("
                 +"_id integer primary key autoincrement, "
                 +"food text, "
-                +"mass real, "
-                +"calories real, "
+                +"mass text, "
+                +"calories text, "
                 +"countable integer);");
-        insertNewFood(db, "popcorn", 1.2,5.6,0);
-        insertNewFood(db, "popcorn", 1.2,5.6,0);
-        insertNewFood(db, "popcorn", 1.2,5.6,0);
-        insertNewFood(db, "popcorn", 1.2,5.6,0);
+        insertNewFood(db, "popcorn", "1.2","5.6",0);
+        insertNewFood(db, "corn", "3.6","4.8",0);
+        insertNewFood(db, "pop", "9.6","3.8",0);
+        insertNewFood(db, "opcor", "4.2","1.7",0);
 
 
     }
@@ -51,6 +51,7 @@ public class SmartscaleDatabaseHelper extends SQLiteOpenHelper {
                                     String calories) {
         ContentValues entryValues = new ContentValues();
         entryValues.put("food", food);
+        date = Calendar.getInstance();
         entryValues.put("date", MainActivity.createDateString(date,true));
         entryValues.put("mass", mass);
         entryValues.put("calories", calories);
@@ -60,8 +61,8 @@ public class SmartscaleDatabaseHelper extends SQLiteOpenHelper {
     //food table
     public static void insertNewFood(SQLiteDatabase db,
                                    String food,
-                                   double mass,
-                                   double calories,
+                                   String mass,
+                                   String calories,
                                    int countable) {
         ContentValues entryValues = new ContentValues();
         entryValues.put("food", food);

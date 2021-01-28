@@ -13,6 +13,8 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import java.util.ArrayList;
+
 public class addDailyEntry extends AppCompatActivity {
     double calMassRatio;
     SQLiteOpenHelper smartscaleDBHelper = new SmartscaleDatabaseHelper(this);
@@ -25,29 +27,68 @@ public class addDailyEntry extends AppCompatActivity {
     double currentCalLeft;
     double projectedCaloriesLeft;
     TextView calLeft;
+    boolean isProportionEntry;
+    protected ArrayList<String> proportionData;
+    double sumOfRatios;
+    TextView propEntryValue;
+    TextView dbText;
+    double totalCaloriesBeingProportioned;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_daily_entry);
         Intent intent = getIntent();
-        int intNum = intent.getIntExtra("id", 0);
+        isProportionEntry = intent.getBooleanExtra("isProportionEntry", false);
+        TextView propEntryText = (TextView) findViewById(R.id.propEntryText);
+        propEntryValue = (TextView) findViewById(R.id.propEntryValue);
+        dbText = (TextView) findViewById(R.id.foodName);
+        calLeft = (TextView) findViewById(R.id.calLeftAddingEntry);
+        setCaloriesLeft();
         db = smartscaleDBHelper.getReadableDatabase();
-        Cursor cursor = db.query("Foodlist", new String[] {"food","mass","calories"}
-            ,"_id = ?", new String[] {Integer.toString(intNum)}, null, null, null);
-        if (cursor.moveToFirst()){
-            food = cursor.getString(0);
-            TextView dbText = (TextView) findViewById(R.id.foodName);
+        if(!isProportionEntry) {
+            propEntryText.setVisibility(View.GONE);
+            propEntryValue.setVisibility(View.GONE);
+            int intNum = intent.getIntExtra("id", 0);
+            Cursor cursor = db.query("Foodlist", new String[]{"food", "mass", "calories"}
+                    , "_id = ?", new String[]{Integer.toString(intNum)}, null, null, null);
+            if (cursor.moveToFirst()) {
+                food = cursor.getString(0);
+                double mass = Double.parseDouble(cursor.getString(1));
+                double calories = Double.parseDouble(cursor.getString(2));
+                calMassRatio = calories / mass;
+            }
             dbText.setText(food);
-            double mass = cursor.getDouble(1);
-            double calories = cursor.getDouble(2);
-            calMassRatio = calories/mass;
+            cursor.close();
         }
-        cursor.close();
+        else
+        {
+            proportionData = intent.getStringArrayListExtra("proportionData");
+            for(int i = 1; i < proportionData.size() ; i += 4 )
+                sumOfRatios += Double.parseDouble(proportionData.get(i));
+            totalCaloriesBeingProportioned = currentCalLeft;
+            proportionedEntry();
+
+        }
+    }
+
+    public void setCaloriesLeft()
+    {
         sharedpreferences = getSharedPreferences("MyPREFERENCES", Context.MODE_PRIVATE);
         currentCalLeft = sharedpreferences.getFloat("calLeft", 2000);
-        calLeft = (TextView) findViewById(R.id.calLeftAddingEntry);
         calLeft.setText(String.format("%.1f", currentCalLeft));
+    }
+
+    public void proportionedEntry()
+    {
+        food = proportionData.get(0);
+        double mass = Double.parseDouble(proportionData.get(2));
+        double calories = Double.parseDouble(proportionData.get(3));
+        calMassRatio = calories/mass;
+        double fractionOfTotalCalories = Double.parseDouble(proportionData.get(1))/sumOfRatios;
+        proportionData.subList(0,4).clear();
+        propEntryValue.setText(String.format("%.1f", fractionOfTotalCalories*totalCaloriesBeingProportioned));
+        dbText.setText(food);
     }
 
     public void calcCalories(View view)
@@ -72,8 +113,16 @@ public class addDailyEntry extends AppCompatActivity {
         editor.putFloat("calLeft", (float) projectedCaloriesLeft);
         editor.commit();
         SmartscaleDatabaseHelper.insertEntry(db, food, strEntryMass, strEntryCalories);
-        db.close();
-        Intent intent = new Intent(this, MainActivity.class);
-        startActivity(intent);
+        if (!isProportionEntry) db.close();
+        if (!isProportionEntry || proportionData.isEmpty())
+        {
+            Intent intent = new Intent(this, MainActivity.class);
+            startActivity(intent);
+        }
+        else
+        {
+            setCaloriesLeft();
+            proportionedEntry();
+        }
     }
 }

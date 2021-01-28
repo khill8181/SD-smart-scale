@@ -14,7 +14,15 @@
         tools:layout_editor_absoluteY="170dp">
 
         <ListView
+            android:id="@+id/foodList"
             android:layout_width="match_parent"
-            android:layout_height="match_parent" />
+            android:layout_height="245dp" />
+
+        <Button
+            android:id="@+id/button"
+            android:layout_width="match_parent"
+            android:layout_height="44dp"
+            android:onClick="submitProportions"
+            android:text="Button" />
     </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

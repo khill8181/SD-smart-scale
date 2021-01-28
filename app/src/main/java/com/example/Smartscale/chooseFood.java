@@ -12,16 +12,19 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.CheckBox;
+import android.widget.CheckedTextView;
 import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
+
+import java.util.ArrayList;
 
 public class chooseFood extends AppCompatActivity {
     private SQLiteDatabase db;
     private Cursor cursor;
     SimpleCursorAdapter adapter;
     ListView list;
-    Bundle selectedFoods;
     Button submitFoodChoices;
+    ArrayList<Integer> ids;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,21 +58,21 @@ public class chooseFood extends AppCompatActivity {
                         startActivity(intent);
                     }
                 };
-
         //Assign the listener to the list view
         list.setOnItemClickListener(itemClickListener);
-
     }
 
     public void proportionedFoodSelection(View view)
     {
+        list.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
         submitFoodChoices.setVisibility(view.VISIBLE);
-        selectedFoods = new Bundle();
-        adapter = new SimpleCursorAdapter(this, R.layout.proportion_food_choice ,cursor,
-                new String[] {"food","calories"},
-                new int[] {R.id.food, R.id.calories}, 0);
+        ids = new ArrayList<Integer>();
+        adapter = new SimpleCursorAdapter(this, android.R.layout.simple_list_item_multiple_choice ,cursor,
+                new String[] {"food"},
+                new int[] {android.R.id.text1}, 0);
         list.setAdapter(adapter);
         //Create the listener
+
         AdapterView.OnItemClickListener itemClickListener =
                 new AdapterView.OnItemClickListener(){
                     @Override
@@ -79,20 +82,22 @@ public class chooseFood extends AppCompatActivity {
                                             long id) {
                         //Pass the drink the user clicks on to DrinkActivity
                         //Intent intent = new Intent(chooseFood.this, addDailyEntry.class);
-                        CheckBox box = (CheckBox) itemView.findViewById(R.id.checkBox);
-                        if (box.isChecked()) selectedFoods.putLong(Long.toString(id),id);
-                        else selectedFoods.remove(Long.toString(id));
+                        CheckedTextView box = (CheckedTextView) itemView;
+                        if (box.isChecked()) ids.add(new Integer((int)id));
+                        else ids.remove(new Integer((int)id));
                     }
                 };
 
         //Assign the listener to the list view
         list.setOnItemClickListener(itemClickListener);
+
+
     }
 
     public void submitSelections(View view)
     {
         Intent intent = new Intent(this, choosingProportions.class);
-        intent.putExtra("theBundle",selectedFoods);
+        intent.putIntegerArrayListExtra("ids",ids);
         startActivity(intent);
     }
 
