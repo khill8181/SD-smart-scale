@@ -14,6 +14,28 @@
         tools:layout_editor_absoluteX="121dp"
         tools:layout_editor_absoluteY="235dp">
 
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="51dp"
+            android:orientation="horizontal">
+
+            <EditText
+                android:id="@+id/searchBar"
+                android:layout_width="331dp"
+                android:layout_height="wrap_content"
+                android:ems="10"
+                android:hint="Search for food"
+                android:inputType="textPersonName" />
+
+            <ImageButton
+                android:id="@+id/imageButton3"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:onClick="displaySearchResults"
+                app:srcCompat="@drawable/ic_search_black_24dp" />
+        </LinearLayout>
+
         <Button
             android:id="@+id/button10"
             android:layout_width="match_parent"

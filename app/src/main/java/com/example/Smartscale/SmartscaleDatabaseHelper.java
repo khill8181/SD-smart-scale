@@ -59,7 +59,7 @@ public class SmartscaleDatabaseHelper extends SQLiteOpenHelper {
     }
 
     //food table
-    public static void insertNewFood(SQLiteDatabase db,
+    public static long insertNewFood(SQLiteDatabase db,
                                    String food,
                                    String mass,
                                    String calories,
@@ -69,7 +69,7 @@ public class SmartscaleDatabaseHelper extends SQLiteOpenHelper {
         entryValues.put("mass", mass);
         entryValues.put("calories", calories);
         entryValues.put("countable", countable);
-        db.insert("Foodlist", null, entryValues);
+        return db.insert("Foodlist", null, entryValues);
     }
 
 

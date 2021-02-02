@@ -10,13 +10,22 @@ import android.database.sqlite.SQLiteOpenHelper;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CheckedTextView;
+import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
 
+import java.io.IOException;
 import java.util.ArrayList;
+
+import okhttp3.ResponseBody;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import retrofit2.Retrofit;
 
 public class chooseFood extends AppCompatActivity {
     private SQLiteDatabase db;
@@ -25,11 +34,15 @@ public class chooseFood extends AppCompatActivity {
     ListView list;
     Button submitFoodChoices;
     ArrayList<Integer> ids;
+    String searchedTerm;
+    EditText searchedTermView;
+    ArrayList<webAPIFood> searchResults;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_choose_food2);
+        searchedTermView = findViewById(R.id.searchBar);
         submitFoodChoices = (Button) findViewById(R.id.submitCombo);
         submitFoodChoices.setVisibility(View.GONE);
         list = (ListView) findViewById(R.id.foodList);
@@ -108,8 +121,72 @@ public class chooseFood extends AppCompatActivity {
         db.close();
     }
 
+    public void displaySearchResults(View view)
+    {
+        searchResults = new ArrayList<webAPIFood>();
+        searchedTerm = searchedTermView.getText().toString();
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl("https://trackapi.nutritionix.com/")
+                .build();
+
+        PlaceholderAPI placeholderAPI = retrofit.create(PlaceholderAPI.class);
+        Call<ResponseBody> call = placeholderAPI.getPosts(searchedTerm,true,false);
+
+        call.enqueue(new Callback<ResponseBody>() {
+            @Override
+            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                if (!response.isSuccessful()) return;
+                try{
+                    String rawText = response.body().string();
+                    int currentIndex = 0;
+                    while(currentIndex != -1)
+                    {
+                        webAPIFood food = new webAPIFood();
+                        currentIndex = rawText.indexOf("food_name",currentIndex) + 12;
+                        food.foodName = rawText.substring(currentIndex,rawText.indexOf('\"',currentIndex));
+                        currentIndex = rawText.indexOf("\"attr_id\":207",currentIndex) + 24;
+                        food.calories = Double.parseDouble(rawText.substring(currentIndex,rawText.indexOf(',',currentIndex)));
+                        currentIndex = rawText.indexOf("serving_weight_grams",currentIndex) + "erving_weight_grams\":1".length();
+                        food.mass = Double.parseDouble(rawText.substring(currentIndex,rawText.indexOf(',',currentIndex)));
+                        searchResults.add(food);
+                        //testing to see if any foods left
+                        currentIndex = rawText.indexOf("food_name",currentIndex);
+                    }
+                    webAPIFood[] array = new webAPIFood[searchResults.size()];
+                    searchResults.toArray(array);
+                    ArrayAdapter<webAPIFood> arrayAdapter = new ArrayAdapter<webAPIFood>(chooseFood.this, android.R.layout.simple_list_item_1, array);
+                    list.setAdapter(arrayAdapter);
+                    AdapterView.OnItemClickListener itemClickListener =
+                            new AdapterView.OnItemClickListener(){
+                                @Override
+                                public void onItemClick(AdapterView<?> list,
+                                                        View itemView,
+                                                        int position,
+                                                        long id) {
+                                    int dbID = (int) SmartscaleDatabaseHelper.insertNewFood(db,array[position].foodName,String.format("%.1f",
+                                                                            array[position].mass),
+                                                                            String.format("%.1f",array[position].calories),0);
+                                    Intent intent = new Intent(chooseFood.this, addDailyEntry.class);
+                                    intent.putExtra("id", (int) dbID);
+                                    startActivity(intent);
+                                }
+                            };
+                    //Assign the listener to the list view
+                    list.setOnItemClickListener(itemClickListener);
+
+                }
+                catch(IOException ex){
+                }
+            }
+            @Override
+            public void onFailure(Call<ResponseBody> call, Throwable t) {
+            }
+        });
+
+    }
+
     /*
-    public void addEntryToDB(View view)
+    public void addFoodEntryToDB(View view)
     {
         SQLiteOpenHelper smartscaleDBHelper = new SmartscaleDatabaseHelper(this);
         Intent intent = new Intent(this, MainActivity.class);
