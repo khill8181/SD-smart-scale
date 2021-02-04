@@ -32,6 +32,9 @@ public class SmartscaleDatabaseHelper extends SQLiteOpenHelper {
                 +"mass text, "
                 +"calories text, "
                 +"countable integer);");
+
+        db.execSQL("create table calories (date text primary key, calGoal integer, calConsumed real);");
+
         insertNewFood(db, "popcorn", "1.2","5.6",0);
         insertNewFood(db, "corn", "3.6","4.8",0);
         insertNewFood(db, "pop", "9.6","3.8",0);
@@ -72,5 +75,13 @@ public class SmartscaleDatabaseHelper extends SQLiteOpenHelper {
         return db.insert("Foodlist", null, entryValues);
     }
 
+    public static void insertCalorieEntry(SQLiteDatabase db,String date, int calGoal, double calConsumed)
+    {
+        ContentValues contentValues = new ContentValues();
+        contentValues.put("date", date);
+        contentValues.put("calGoal", calGoal);
+        contentValues.put("calConsumed", calConsumed);
+        db.insert("calories", null, contentValues);
+    }
 
 }

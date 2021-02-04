@@ -25,7 +25,6 @@ public class addDailyEntry extends AppCompatActivity {
     String strCalLeft;
     SharedPreferences sharedpreferences;
     double currentCalLeft;
-    double projectedCaloriesLeft;
     TextView calLeft;
     boolean isProportionEntry;
     protected ArrayList<String> proportionData;
@@ -33,6 +32,8 @@ public class addDailyEntry extends AppCompatActivity {
     TextView propEntryValue;
     TextView dbText;
     double totalCaloriesBeingProportioned;
+    double calConsumedToday;
+    double entryCalories;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -75,7 +76,9 @@ public class addDailyEntry extends AppCompatActivity {
     public void setCaloriesLeft()
     {
         sharedpreferences = getSharedPreferences("MyPREFERENCES", Context.MODE_PRIVATE);
-        currentCalLeft = sharedpreferences.getFloat("calLeft", 2000);
+        int calGoal = sharedpreferences.getInt("calGoal",2000);
+        calConsumedToday = sharedpreferences.getFloat("calConsumedToday", 0);
+        currentCalLeft = calGoal-calConsumedToday;
         calLeft.setText(String.format("%.1f", currentCalLeft));
     }
 
@@ -96,21 +99,19 @@ public class addDailyEntry extends AppCompatActivity {
         EditText editText = (EditText) findViewById(R.id.givenMass);
         strEntryMass = editText.getText().toString();
         double entryMass = Double.parseDouble(strEntryMass);
-        double entryCalories = calMassRatio*entryMass;
+        entryCalories = calMassRatio*entryMass;
         strEntryCalories = String.format("%.1f", entryCalories);
         strEntryMass = String.format("%.1f", entryMass);
         TextView calories = (TextView) findViewById(R.id.calcCalories);
         calories.setText(strEntryCalories);
-
-        projectedCaloriesLeft = currentCalLeft-entryCalories;
-        strCalLeft = String.format("%.1f", projectedCaloriesLeft);
+        strCalLeft = String.format("%.1f", currentCalLeft-entryCalories);
         calLeft.setText(strCalLeft);
     }
 
     public void insertDailyEntry(View view)
     {
         SharedPreferences.Editor editor = sharedpreferences.edit();
-        editor.putFloat("calLeft", (float) projectedCaloriesLeft);
+        editor.putFloat("calConsumedToday", (float) (calConsumedToday + entryCalories));
         editor.commit();
         SmartscaleDatabaseHelper.insertEntry(db, food, strEntryMass, strEntryCalories);
         if (!isProportionEntry) db.close();
