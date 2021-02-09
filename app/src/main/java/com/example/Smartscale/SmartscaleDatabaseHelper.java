@@ -31,14 +31,14 @@ public class SmartscaleDatabaseHelper extends SQLiteOpenHelper {
                 +"food text, "
                 +"mass text, "
                 +"calories text, "
-                +"countable integer);");
+                +"count integer);");
 
         db.execSQL("create table calories (date text primary key, calGoal integer, calConsumed real);");
 
-        insertNewFood(db, "popcorn", "1.2","5.6",0);
+        insertNewFood(db, "popcorn", "1.2","5.6",3);
         insertNewFood(db, "corn", "3.6","4.8",0);
         insertNewFood(db, "pop", "9.6","3.8",0);
-        insertNewFood(db, "opcor", "4.2","1.7",0);
+        insertNewFood(db, "opcor", "4.2","1.7",1);
 
 
     }
@@ -61,17 +61,30 @@ public class SmartscaleDatabaseHelper extends SQLiteOpenHelper {
         db.insert("Foodlog", null, entryValues);
     }
 
+    public static void insertEntryTesting(SQLiteDatabase db,
+                                   String food,
+                                   Calendar date,
+                                   String mass,
+                                   String calories) {
+        ContentValues entryValues = new ContentValues();
+        entryValues.put("food", food);
+        entryValues.put("date", MainActivity.createDateString(date,true));
+        entryValues.put("mass", mass);
+        entryValues.put("calories", calories);
+        db.insert("Foodlog", null, entryValues);
+    }
+
     //food table
     public static long insertNewFood(SQLiteDatabase db,
                                    String food,
                                    String mass,
                                    String calories,
-                                   int countable) {
+                                   int count) {
         ContentValues entryValues = new ContentValues();
         entryValues.put("food", food);
         entryValues.put("mass", mass);
         entryValues.put("calories", calories);
-        entryValues.put("countable", countable);
+        entryValues.put("count", count);
         return db.insert("Foodlist", null, entryValues);
     }
 

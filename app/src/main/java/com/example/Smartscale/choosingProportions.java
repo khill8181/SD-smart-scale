@@ -21,6 +21,7 @@ public class choosingProportions extends AppCompatActivity {
     ArrayList<String> data;
     Cursor cursor;
     SQLiteDatabase db;
+    int foodCount;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -30,7 +31,7 @@ public class choosingProportions extends AppCompatActivity {
         db = smartscaleDBHelper.getReadableDatabase();
         Intent intent = getIntent();
         ArrayList<Integer> ids = intent.getIntegerArrayListExtra("ids");
-        int foodCount = ids.size();
+        foodCount = ids.size();
         String[] stringIds = new String[foodCount];
         for(int i=0; i<foodCount ; i++)
             stringIds[i] = ids.get(i).toString();
@@ -43,15 +44,15 @@ public class choosingProportions extends AppCompatActivity {
                 threeOrMoreFoods = threeOrMoreFoods + specifyId;
             }
         }
-        cursor = db.query("Foodlist", new String[] {"_id","food","mass","calories"},"_id = ? or _id = ?".concat(threeOrMoreFoods), stringIds
+        cursor = db.query("Foodlist", new String[] {"_id","food","mass","calories","count"},"_id = ? or _id = ?".concat(threeOrMoreFoods), stringIds
                 ,null,null,null);
         list = (ListView) findViewById(R.id.foodList);
         choosingProportionsAdapter adapter = new choosingProportionsAdapter(this, cursor);
         list.setAdapter(adapter);
         adapter.setListener(new choosingProportionsAdapter.Listener() {
             @Override
-            public void onLoseFocus(String food, String proportion, String mass, String calories) {
-                if (!data.contains(food)) {data.add(food);data.add(proportion);data.add(mass);data.add(calories);}
+            public void onLoseFocus(String food, String proportion, String mass, String calories, String count) {
+                if (!data.contains(food)) {data.add(food);data.add(proportion);data.add(mass);data.add(calories);data.add(count);}
                 else if (data.get(data.indexOf(food) + 1) != proportion) data.set(data.indexOf(food)+1,proportion);
                 }
         });
@@ -61,9 +62,27 @@ public class choosingProportions extends AppCompatActivity {
 
     public void submitProportions(View view)
     {
-        Intent intent = new Intent(this, addDailyEntry.class);
+        if (view.getId() == R.id.restOfCal)
+        {
+            Intent intent = new Intent(this, addDailyEntry.class);
+            intentChooserHelperForsubmitProportions(intent);
+            intent.putExtra("isProportionEntry",true);
+        }
+        if (view.getId() == R.id.chooseCalAmount){
+            Intent intent = new Intent(this, chooseCalAmount.class);
+            intentChooserHelperForsubmitProportions(intent);
+        }
+        if (view.getId() == R.id.chooseCountable){
+            Intent intent = new Intent(this, chooseCountableItem.class);
+            intent.putExtra("foodCount",foodCount);
+            intentChooserHelperForsubmitProportions(intent);
+
+        }
+    }
+
+    public void intentChooserHelperForsubmitProportions(Intent intent)
+    {
         intent.putStringArrayListExtra("proportionData",data);
-        intent.putExtra("isProportionEntry",true);
         startActivity(intent);
     }
 

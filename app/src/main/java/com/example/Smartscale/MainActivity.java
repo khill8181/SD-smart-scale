@@ -1,7 +1,6 @@
 package com.example.Smartscale;
 
 import androidx.appcompat.app.AppCompatActivity;
-
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -15,6 +14,8 @@ import android.view.View;
 import android.widget.SimpleCursorAdapter;
 import android.widget.TextView;
 import java.util.Calendar;
+//import androidx.appcompat.widget.Toolbar;
+import android.widget.Toolbar;
 import java.util.List;
 import retrofit2.Call;
 import retrofit2.Retrofit;
@@ -36,6 +37,8 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        Toolbar toolbar = (Toolbar) findViewById(R.id.mainToolbar);
+        setActionBar(toolbar);
         SQLiteOpenHelper smartscaleDBHelper = new SmartscaleDatabaseHelper(this);
         list = (ListView) findViewById(R.id.dailyEntries);
         db = smartscaleDBHelper.getReadableDatabase();
@@ -46,15 +49,12 @@ public class MainActivity extends AppCompatActivity {
         sharedpreferences = getSharedPreferences("MyPREFERENCES", Context.MODE_PRIVATE);
         //int calGoal = sharedpreferences.getInt("calGoal", 2000);
         //double calConsumedToday = sharedpreferences.getFloat("calConsumedToday", 0);
-
-
-        String lastDayOpened = sharedpreferences.getString("lastDayOpened", "never");
-        //String lastDayOpened = "0-29-2021";
-        //SmartscaleDatabaseHelper.insertCalorieEntry(db, lastDayOpened, 2000, 0);
+        //String lastDayOpened = sharedpreferences.getString("lastDayOpened", "never");
+        String lastDayOpened = "1-4-2021";
+        SmartscaleDatabaseHelper.insertCalorieEntry(db, lastDayOpened, 2000, 0);
         String currentDateString = createDateString(currentDate,true);
         SharedPreferences.Editor editor = sharedpreferences.edit();
         editor.putString("oldestDateAvailable", "0-29-2021");
-        SmartscaleDatabaseHelper.insertCalorieEntry(db, "0-29-2021", 2000, 0);
         if (lastDayOpened == "never" || lastDayOpened != currentDateString){
             if(lastDayOpened == "never") {
                 SmartscaleDatabaseHelper.insertCalorieEntry(db, currentDateString, 2000, 0); //insert todays date into the table, only for first time opening app
@@ -214,38 +214,8 @@ public class MainActivity extends AppCompatActivity {
     {
         Intent intent = new Intent(MainActivity.this, chooseFood.class);
         startActivity(intent);
-        /* AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("Choose entry type")
-                .setItems(new String[] {"individual item","proportioned combo"}, new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int which) {
-                        // The 'which' argument contains the index position
-                        // of the selected item
-                        if (which == 0)
-                        {
-                            intent.putExtra("isCounted", true);
-                            startActivity(intent);
-                        }
-                        if (which == 1)
-                        {
-                            intent.putExtra("isCounted", false);
-                            startActivity(intent);
-                        }
-                        if (which == 2) {}
-                    }})
-                .show();*/
-
-    }
-/*
-    public boolean onOptionsItemSelected(MenuItem item) {
-
-        //switch (item.getItemId()) {
-          //  case R.id.goal: return true;
-            //default: return true;}
-        Intent intent = new Intent(this, calorieGoal.class);
-        startActivity(intent);
-        return true;
 
 
     }
-*/
+
 }

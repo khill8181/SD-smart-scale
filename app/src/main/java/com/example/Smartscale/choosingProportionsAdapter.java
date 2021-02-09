@@ -15,7 +15,7 @@ public class choosingProportionsAdapter extends CursorAdapter {
     private  Listener listener;
 
     interface Listener {
-        void onLoseFocus(String food, String proportion, String mass, String calories);
+        void onLoseFocus(String food, String proportion, String mass, String calories, String count);
     }
 
     public void setListener(Listener listener)
@@ -42,6 +42,7 @@ public class choosingProportionsAdapter extends CursorAdapter {
         String foodString = cursor.getString(cursor.getColumnIndex("food"));
         String mass = cursor.getString(cursor.getColumnIndex("mass"));
         String calories = cursor.getString(cursor.getColumnIndex("calories"));
+        String count = Integer.toString(cursor.getInt(cursor.getColumnIndex(("count"))));
         food.setText(foodString);
 
         EditText proportion = (EditText) view.findViewById((R.id.proportion));
@@ -49,7 +50,7 @@ public class choosingProportionsAdapter extends CursorAdapter {
             @Override
             public void onFocusChange(View v, boolean hasFocus) {
                 if (!hasFocus)
-                    listener.onLoseFocus(foodString,proportion.getText().toString(),mass,calories);
+                    listener.onLoseFocus(foodString,proportion.getText().toString(),mass,calories,count);
             }
         });
 

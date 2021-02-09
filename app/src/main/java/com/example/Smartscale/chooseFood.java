@@ -49,7 +49,7 @@ public class chooseFood extends AppCompatActivity {
         SQLiteOpenHelper smartscaleDBHelper = new SmartscaleDatabaseHelper(this);
         db = smartscaleDBHelper.getReadableDatabase();
         cursor = db.query("Foodlist", new String[] {"_id","food",
-                "mass", "calories", "countable"},null,null,null,null,null);
+                "mass", "calories", "count"},null,null,null,null,null);
 
         adapter = new SimpleCursorAdapter(this, R.layout.food_log_item ,cursor,
                 new String[] {"food","calories"},
@@ -119,6 +119,28 @@ public class chooseFood extends AppCompatActivity {
         super.onDestroy();
         cursor.close();
         db.close();
+    }
+
+    public void listCountableFoods(View view){
+        Cursor newCursor = db.query("Foodlist", new String[] {"_id","food",
+                "mass", "calories", "count"},"count != ? ",new String[]{"0"},null,null,null);
+        adapter.changeCursor(newCursor);
+        AdapterView.OnItemClickListener itemClickListener =
+                new AdapterView.OnItemClickListener(){
+                    @Override
+                    public void onItemClick(AdapterView<?> list,
+                                            View itemView,
+                                            int position,
+                                            long id) {
+                        //Pass the drink the user clicks on to DrinkActivity
+                        Intent intent = new Intent(chooseFood.this, addDailyEntry.class);
+                        intent.putExtra("id", (int) id);
+                        intent.putExtra("isCountEntry", true);
+                        startActivity(intent);
+                    }
+                };
+        //Assign the listener to the list view
+        list.setOnItemClickListener(itemClickListener);
     }
 
     public void displaySearchResults(View view)
