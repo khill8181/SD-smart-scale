@@ -34,7 +34,7 @@ public class SmartscaleDatabaseHelper extends SQLiteOpenHelper {
                 +"count integer);");
 
         db.execSQL("create table calories (date text primary key, calGoal integer, calConsumed real);");
-
+        db.execSQL("create table delayedEntries (_id integer primary key autoincrement, foodID integer, mass real)");
         insertNewFood(db, "popcorn", "1.2","5.6",3);
         insertNewFood(db, "corn", "3.6","4.8",0);
         insertNewFood(db, "pop", "9.6","3.8",0);
@@ -45,6 +45,14 @@ public class SmartscaleDatabaseHelper extends SQLiteOpenHelper {
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion){
+    }
+
+    public static void insertDelayedMeasurement(SQLiteDatabase db, int foodID, double mass)
+    {
+        ContentValues entryValues = new ContentValues();
+        entryValues.put("foodID",foodID);
+        entryValues.put("mass",mass);
+        db.insert("delayedEntries",null,entryValues);
     }
 
     //daily entry

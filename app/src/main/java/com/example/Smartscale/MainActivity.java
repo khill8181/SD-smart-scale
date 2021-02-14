@@ -89,12 +89,12 @@ public class MainActivity extends AppCompatActivity {
         calGoalView.setText(Integer.toString(calGoal));
         calLeftView.setText(String.format("%.1f", calGoal-calConsumed));*/
 
-        cursor = db.query("Foodlog", new String[] {"_id","food","calories"},"date = ?",new String[] {createDateString(focusedDate,true)}
+        cursor = db.query("Foodlog", new String[] {"_id","food","calories","mass"},"date = ?",new String[] {createDateString(focusedDate,true)}
                 ,null,null,null);
 
         adapter = new SimpleCursorAdapter(this, R.layout.food_log_item ,cursor,
-        new String[] {"food","calories"},
-        new int[] {R.id.food, R.id.calories}, 0);
+        new String[] {"food","calories","mass"},
+        new int[] {R.id.food, R.id.calories, R.id.mass}, 0);
 
 
         list.setAdapter(adapter);
@@ -210,9 +210,17 @@ public class MainActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
+    public void completeDelayedMeasurement(View view)
+    {
+        Intent intent = new Intent(MainActivity.this, completeDelayedMeas.class);
+        startActivity(intent);
+    }
+
     public void insertDailyEntry(View view)
     {
+
         Intent intent = new Intent(MainActivity.this, chooseFood.class);
+        if (view.getId() == R.id.begDelMeas) intent.putExtra("isDelayedMeasurement",true);
         startActivity(intent);
 
 

@@ -82,6 +82,28 @@
 
         <LinearLayout
             android:layout_width="match_parent"
+            android:layout_height="42dp"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/begDelMeas"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:onClick="insertDailyEntry"
+                android:text="Begin delayed meas" />
+
+            <Button
+                android:id="@+id/completeDelayedMeas"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:onClick="completeDelayedMeasurement"
+                android:text="Complete delayed meas" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal">
 

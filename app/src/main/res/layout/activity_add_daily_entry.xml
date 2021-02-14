@@ -20,13 +20,36 @@
             android:text="TextView"
             android:textSize="36sp" />
 
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="54dp"
+            android:orientation="horizontal">
+
+            <EditText
+                android:id="@+id/massFromScale"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:ems="10"
+                android:hint="Mass from scale"
+                android:inputType="numberDecimal" />
+
+            <Button
+                android:id="@+id/button8"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:onClick="updateMassSeenByUser"
+                android:text="Update mass seen by user" />
+        </LinearLayout>
+
         <EditText
-            android:id="@+id/givenMass"
+            android:id="@+id/massSeenByUser"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:ems="10"
             android:hint="mass"
-            android:inputType="number"
+            android:inputType="numberDecimal"
             android:textSize="36sp" />
 
         <Button
@@ -49,16 +72,19 @@
                 android:text="Calories"
                 android:textSize="36sp" />
 
-            <TextView
+            <EditText
                 android:id="@+id/calcCalories"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="TextView"
-                android:textSize="36sp" />
+                android:ems="10"
+                android:inputType="numberDecimal"
+                android:text="0" />
+
         </LinearLayout>
 
         <LinearLayout
+            android:id="@+id/proportionView"
             android:layout_width="match_parent"
             android:layout_height="71dp"
             android:orientation="horizontal">

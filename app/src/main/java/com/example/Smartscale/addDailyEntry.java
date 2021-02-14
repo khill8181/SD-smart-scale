@@ -3,7 +3,6 @@ package com.example.Smartscale;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.ContentValues;
-import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
@@ -12,6 +11,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -24,7 +24,7 @@ public class addDailyEntry extends AppCompatActivity {
     SQLiteDatabase db;
     String food;
     String strEntryCalories;
-    String strEntryMass;
+    String strEntryMass = "0";
     String strCalLeft;
     SharedPreferences sharedpreferences;
     double currentCalLeft;
@@ -41,26 +41,36 @@ public class addDailyEntry extends AppCompatActivity {
     boolean isCountEntry;
     double firstEntryRatio;
     Intent intent;
+    EditText calories;
+    int foodID;
+    double entryMass;
+    EditText massFromScale;
+    EditText massSeenByUser;
+    boolean isCompleteDelayedMeasurement;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_daily_entry);
+        LinearLayout proportionView = findViewById(R.id.proportionView);
+        calories = (EditText) findViewById(R.id.calcCalories);
         intent = getIntent();
+        isCompleteDelayedMeasurement = intent.getBooleanExtra("isCompleteDelayedMeasurement",false);
         isProportionEntry = intent.getBooleanExtra("isProportionEntry", false);
         isCountEntry = intent.getBooleanExtra("isCountEntry",false);
         TextView propEntryText = (TextView) findViewById(R.id.propEntryText);
         propEntryValue = (TextView) findViewById(R.id.propEntryValue);
         dbText = (TextView) findViewById(R.id.foodName);
         calLeft = (TextView) findViewById(R.id.calLeftAddingEntry);
+        massFromScale = findViewById(R.id.massFromScale);
+        massSeenByUser = (EditText) findViewById(R.id.massSeenByUser);
         db = smartscaleDBHelper.getReadableDatabase();
         setCaloriesLeft();
         if(!isProportionEntry) {
-            propEntryText.setVisibility(View.GONE);
-            propEntryValue.setVisibility(View.GONE);
-            int intNum = intent.getIntExtra("id", 0);
+            proportionView.setVisibility(View.GONE);
+            foodID = intent.getIntExtra("id", 0);
             Cursor cursor = db.query("Foodlist", new String[]{"food", "mass", "calories","count"}
-                    , "_id = ?", new String[]{Integer.toString(intNum)}, null, null, null);
+                    , "_id = ?", new String[]{Integer.toString(foodID)}, null, null, null);
             if (cursor.moveToFirst()) {
                 food = cursor.getString(0);
                 double mass = Double.parseDouble(cursor.getString(1));
@@ -98,6 +108,16 @@ public class addDailyEntry extends AppCompatActivity {
         }
     }
 
+    public void updateMassSeenByUser(View view)
+    {
+        if(isCompleteDelayedMeasurement)
+        {
+            double initialMeasurement = intent.getDoubleExtra("initialMeasurement",0);
+            double calculatedMassMeasurement = initialMeasurement - Double.parseDouble(massFromScale.getText().toString());
+            massSeenByUser.setText(String.format("%.1f", calculatedMassMeasurement));
+        }
+    }
+
     public void setCaloriesLeft() {
         Cursor calConsumedCursor = db.query("calories", new String[] {"calGoal","calConsumed"},"date = ?",
                 new String [] {MainActivity.createDateString(Calendar.getInstance(),true)},null,null,null);
@@ -122,16 +142,14 @@ public class addDailyEntry extends AppCompatActivity {
 
     public void calcCalories(View view)
     {
-        EditText editText = (EditText) findViewById(R.id.givenMass);
-        strEntryMass = editText.getText().toString();
-        double entryMass = Double.parseDouble(strEntryMass);
+        strEntryMass = massSeenByUser.getText().toString();
+        entryMass = Double.parseDouble(strEntryMass);
 
         if(isCountEntry) entryCalories = calCountRatio*entryMass;
         else entryCalories = calMassRatio*entryMass;
 
         strEntryCalories = String.format("%.1f", entryCalories);
         strEntryMass = String.format("%.1f", entryMass);
-        TextView calories = (TextView) findViewById(R.id.calcCalories);
         calories.setText(strEntryCalories);
         strCalLeft = String.format("%.1f", currentCalLeft-entryCalories);
         calLeft.setText(strCalLeft);
@@ -139,22 +157,31 @@ public class addDailyEntry extends AppCompatActivity {
 
     public void insertDailyEntry(View view)
     {
-        String date = MainActivity.createDateString(Calendar.getInstance(),true);
-        ContentValues contentValues = new ContentValues();
-        contentValues.put("calConsumed",calConsumedToday+entryCalories);
-        db.update("calories",contentValues,"date=?",new String[]{date});
-        SmartscaleDatabaseHelper.insertEntry(db, food, strEntryMass, strEntryCalories);
-        if (!isProportionEntry) db.close();
-        if (!isProportionEntry || proportionData.isEmpty())
+        if(intent.getBooleanExtra("isDelayedMeasurement",false))
         {
-            Intent intent = new Intent(this, MainActivity.class);
-            startActivity(intent);
+            SmartscaleDatabaseHelper.insertDelayedMeasurement(db,foodID,entryMass);
+            Intent newIntent = new Intent(this, MainActivity.class);
+            startActivity(newIntent);
         }
-        else
-        {
-            setCaloriesLeft();
-            if(!isCountEntry) proportionedEntry();
-            else countComboSetup();
+        else {
+            strEntryCalories = String.format("%.1f", Double.parseDouble(calories.getText().toString()));
+            String date = MainActivity.createDateString(Calendar.getInstance(), true);
+            ContentValues contentValues = new ContentValues();
+            contentValues.put("calConsumed", calConsumedToday + entryCalories);
+            db.update("calories", contentValues, "date=?", new String[]{date});
+            SmartscaleDatabaseHelper.insertEntry(db, food, strEntryMass, strEntryCalories);
+            if (!isProportionEntry || proportionData.isEmpty()) {
+                if(isCompleteDelayedMeasurement)
+                    db.delete("delayedEntries","foodID = ?", new String[] {Integer.toString(foodID)} );
+                db.close();
+                Intent intent = new Intent(this, MainActivity.class);
+                startActivity(intent);
+            }
+            else {
+                setCaloriesLeft();
+                if (!isCountEntry) proportionedEntry();
+                else countComboSetup();
+            }
         }
     }
 

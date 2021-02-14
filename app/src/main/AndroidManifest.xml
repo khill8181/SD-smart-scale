@@ -11,7 +11,8 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/SmartScaleTheme">
-        <activity android:name=".chooseCountableItem"></activity>
+        <activity android:name=".completeDelayedMeas"></activity>
+        <activity android:name=".chooseCountableItem" />
         <activity android:name=".chooseCalAmount" />
         <activity android:name=".choosingProportions" />
         <activity android:name=".chooseFood" />

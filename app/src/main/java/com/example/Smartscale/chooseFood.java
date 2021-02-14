@@ -66,8 +66,10 @@ public class chooseFood extends AppCompatActivity {
                                             int position,
                                             long id) {
                         //Pass the drink the user clicks on to DrinkActivity
+                        Intent oldIntent = getIntent();
                         Intent intent = new Intent(chooseFood.this, addDailyEntry.class);
                         intent.putExtra("id", (int) id);
+                        intent.putExtra("isDelayedMeasurement",oldIntent.getBooleanExtra("isDelayedMeasurement",false));
                         startActivity(intent);
                     }
                 };
