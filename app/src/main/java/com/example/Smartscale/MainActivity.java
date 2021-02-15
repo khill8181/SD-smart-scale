@@ -31,6 +31,8 @@ public class MainActivity extends AppCompatActivity {
     TextView calGoalView;
     TextView calLeftView;
     SharedPreferences sharedpreferences;
+    static boolean startUp = true;
+    SharedPreferences.Editor editor;
 
 
     @Override
@@ -41,21 +43,23 @@ public class MainActivity extends AppCompatActivity {
         setActionBar(toolbar);
         SQLiteOpenHelper smartscaleDBHelper = new SmartscaleDatabaseHelper(this);
         list = (ListView) findViewById(R.id.dailyEntries);
+        calGoalView = (TextView) findViewById(R.id.calorieGoal);
+        calLeftView = (TextView) findViewById(R.id.caloriesLeft);
         db = smartscaleDBHelper.getReadableDatabase();
         date = (TextView) findViewById(R.id.date);
-        //currentDate would be for going forward in time
-        focusedDate = Calendar.getInstance();
-        currentDate = Calendar.getInstance(); // Returns instance with current date and time set
         sharedpreferences = getSharedPreferences("MyPREFERENCES", Context.MODE_PRIVATE);
-        //int calGoal = sharedpreferences.getInt("calGoal", 2000);
-        //double calConsumedToday = sharedpreferences.getFloat("calConsumedToday", 0);
+        editor = sharedpreferences.edit();
+        currentDate = Calendar.getInstance(); // Returns instance with current date and time set
+        if (startUp) {focusedDate = Calendar.getInstance(); editor.putString("focusedDate",createDateString(currentDate,true));}
+        else focusedDate = parseDateStringToCalendar(sharedpreferences.getString("focusedDate","string"));
         //String lastDayOpened = sharedpreferences.getString("lastDayOpened", "never");
-        String lastDayOpened = "1-4-2021";
-        SmartscaleDatabaseHelper.insertCalorieEntry(db, lastDayOpened, 2000, 0);
+        String lastDayOpened = "1-10-2021";//for testing
         String currentDateString = createDateString(currentDate,true);
-        SharedPreferences.Editor editor = sharedpreferences.edit();
-        editor.putString("oldestDateAvailable", "0-29-2021");
-        if (lastDayOpened == "never" || lastDayOpened != currentDateString){
+
+        editor.putString("oldestDateAvailable", "1-10-2021");//for testing
+        SmartscaleDatabaseHelper.insertCalorieEntry(db, lastDayOpened, 2000, 0);
+        if (lastDayOpened == "never" || lastDayOpened != currentDateString)
+        {
             if(lastDayOpened == "never") {
                 SmartscaleDatabaseHelper.insertCalorieEntry(db, currentDateString, 2000, 0); //insert todays date into the table, only for first time opening app
                 editor.putString("oldestDateAvailable", createDateString(currentDate,true));
@@ -63,7 +67,7 @@ public class MainActivity extends AppCompatActivity {
             else {
                 Calendar parsedDate = parseDateStringToCalendar(lastDayOpened);
                 Cursor mostRecentGoalCursor = db.query("calories", new String[] {"calGoal"},"date = ?",
-                        new String [] {createDateString(parsedDate,true)},null,null,null);
+                        new String [] {lastDayOpened},null,null,null);
                 mostRecentGoalCursor.moveToFirst();
                 int calGoal = mostRecentGoalCursor.getInt(0);
                 do {
@@ -77,17 +81,9 @@ public class MainActivity extends AppCompatActivity {
             editor.putString("lastDayOpened",currentDateString);
             editor.commit();
         }
-        calGoalView = (TextView) findViewById(R.id.calorieGoal);
-        calLeftView = (TextView) findViewById(R.id.caloriesLeft);
-        //currently, focusedDate is always currentDate
+
         setCalGoalAndLeft(focusedDate);
-        /*Cursor calConsumedCursor = db.query("calories", new String[] {"calGoal","calConsumed"},"date = ?",
-                            new String [] {createDateString(focusedDate,true)},null,null,null);
-        calConsumedCursor.moveToFirst();
-        int calGoal = calConsumedCursor.getInt(0);
-        double calConsumed = calConsumedCursor.getDouble(1);
-        calGoalView.setText(Integer.toString(calGoal));
-        calLeftView.setText(String.format("%.1f", calGoal-calConsumed));*/
+        displayDate(focusedDate);
 
         cursor = db.query("Foodlog", new String[] {"_id","food","calories","mass"},"date = ?",new String[] {createDateString(focusedDate,true)}
                 ,null,null,null);
@@ -147,6 +143,12 @@ public class MainActivity extends AppCompatActivity {
         db.close();
     }
 
+    @Override
+    public void onPause() {
+        super.onPause();
+        startUp = false;
+    }
+
     static public String createDateString(Calendar date, boolean db)
     {
         int month;
@@ -158,6 +160,12 @@ public class MainActivity extends AppCompatActivity {
         return Integer.toString(month) +"-"+day+"-"+year;
     }
 
+    public void displayDate(Calendar focusedDate)
+    {
+        if (focusedDate.get(Calendar.DAY_OF_YEAR) == currentDate.get(Calendar.DAY_OF_YEAR)) date.setText("Today");
+        else date.setText(createDateString(focusedDate,false));
+    }
+
     public void previousDay(View view)
     {
         String oldestDateAvailable = sharedpreferences.getString("oldestDateAvailable","string");
@@ -165,12 +173,14 @@ public class MainActivity extends AppCompatActivity {
         if(!oldestDateAvailable.equals(string))
         {
             rollBackward(focusedDate);
-            Cursor newCursor = db.query("Foodlog", new String[]{"_id", "food", "calories"}, "date = ?", new String[]{createDateString(focusedDate, true)}
+            editor.putString("focusedDate",createDateString(focusedDate,true));
+            Cursor newCursor = db.query("Foodlog", new String[]{"_id", "food", "calories","mass"}, "date = ?", new String[]{createDateString(focusedDate, true)}
                     , null, null, null);
             adapter.changeCursor(newCursor);
-            date.setText(createDateString(focusedDate, false));
+            displayDate(focusedDate);
             cursor = newCursor;
             setCalGoalAndLeft(focusedDate);
+            editor.commit();
         }
     }
 
@@ -194,13 +204,14 @@ public class MainActivity extends AppCompatActivity {
         if (focusedDate.get(Calendar.DAY_OF_YEAR) != currentDate.get(Calendar.DAY_OF_YEAR))
         {
             rollForward(focusedDate);
-            Cursor newCursor = db.query("Foodlog", new String[] {"_id","food","calories"},"date = ?",new String[] {createDateString(focusedDate,true)}
+            editor.putString("focusedDate",createDateString(focusedDate,true));
+            Cursor newCursor = db.query("Foodlog", new String[] {"_id","food","calories","mass"},"date = ?",new String[] {createDateString(focusedDate,true)}
                     ,null,null,null);
             adapter.changeCursor(newCursor);
-            if (focusedDate.get(Calendar.DAY_OF_YEAR) == currentDate.get(Calendar.DAY_OF_YEAR)) date.setText("Today");
-            else date.setText(createDateString(focusedDate,false));
+            displayDate(focusedDate);
             cursor = newCursor;
             setCalGoalAndLeft(focusedDate);
+            editor.commit();
         }
     }
 

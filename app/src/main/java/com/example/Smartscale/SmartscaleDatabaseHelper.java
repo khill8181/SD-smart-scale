@@ -1,6 +1,7 @@
 package com.example.Smartscale;
 
 import android.content.ContentValues;
+import android.content.SharedPreferences;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
@@ -10,7 +11,6 @@ import java.util.Calendar;
 
 public class SmartscaleDatabaseHelper extends SQLiteOpenHelper {
 
-    static Calendar date;
     private static final String DB_NAME = "smartScale";
     private static final int DB_VERSION = 1;
     SmartscaleDatabaseHelper(Context context){
@@ -58,12 +58,12 @@ public class SmartscaleDatabaseHelper extends SQLiteOpenHelper {
     //daily entry
     public static void insertEntry(SQLiteDatabase db,
                                     String food,
+                                    String date,
                                     String mass,
                                     String calories) {
         ContentValues entryValues = new ContentValues();
         entryValues.put("food", food);
-        date = Calendar.getInstance();
-        entryValues.put("date", MainActivity.createDateString(date,true));
+        entryValues.put("date", date);
         entryValues.put("mass", mass);
         entryValues.put("calories", calories);
         db.insert("Foodlog", null, entryValues);
