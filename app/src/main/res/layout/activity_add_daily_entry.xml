@@ -28,7 +28,12 @@
             android:hint="mass"
             android:inputType="number"
             android:textSize="36sp" />
-
+        <Button
+            android:id="@+id/buttonConnect"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_horizontal"
+            android:text="Connect Scale" />
         <Button
             android:id="@+id/button5"
             android:layout_width="match_parent"

@@ -9,17 +9,28 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
+import android.os.Message;
+import android.util.Log;
 import android.widget.AdapterView;
+import android.widget.Button;
 import android.widget.ListView;
 import android.view.View;
 import android.widget.SimpleCursorAdapter;
 import android.widget.TextView;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.Calendar;
 import java.util.List;
+import java.util.UUID;
 
 import retrofit2.Call;
 import retrofit2.Retrofit;
+
+import static android.content.ContentValues.TAG;
 
 public class MainActivity extends AppCompatActivity {
     public static final String EXTRA_MESSAGE = "com.example.Smartscale.MESSAGE";
@@ -64,8 +75,6 @@ public class MainActivity extends AppCompatActivity {
 
         list.setAdapter(adapter);
 
-
-
         //Create the listener
         AdapterView.OnItemClickListener itemClickListener =
                 new AdapterView.OnItemClickListener(){
@@ -83,6 +92,7 @@ public class MainActivity extends AppCompatActivity {
 
         //Assign the listener to the list view
         list.setOnItemClickListener(itemClickListener);
+
     }
 
     @Override
@@ -177,4 +187,5 @@ public class MainActivity extends AppCompatActivity {
 
     }
 */
+
 }

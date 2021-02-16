@@ -101,10 +101,14 @@
             android:layout_height="wrap_content"
             android:text="Today's entries" />
 
+
         <ListView
             android:id="@+id/dailyEntries"
             android:layout_width="match_parent"
-            android:layout_height="match_parent" />
+            android:layout_height="match_parent" >
+
+
+        </ListView>
 
     </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>
