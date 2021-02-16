@@ -10,23 +10,26 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+
+import org.w3c.dom.Text;
 
 import java.util.ArrayList;
 import java.util.Calendar;
 
 public class addDailyEntry extends AppCompatActivity {
-    double calMassRatio;
+    double calMassRatioG;
     double calCountRatio;
     SQLiteOpenHelper smartscaleDBHelper = new SmartscaleDatabaseHelper(this);
     SQLiteDatabase db;
     String food;
     String strEntryCalories;
-    String strEntryMass = "0";
-    String strCalLeft;
     SharedPreferences sharedPreferences;
     double currentCalLeft;
     TextView calLeft;
@@ -49,7 +52,10 @@ public class addDailyEntry extends AppCompatActivity {
     EditText massSeenByUser;
     boolean isCompleteDelayedMeasurement;
     String focusedDate;
-
+    TextView units;
+    String unitsString;
+    Button unitToggle;
+    boolean emptyEntryMass = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,7 +63,10 @@ public class addDailyEntry extends AppCompatActivity {
         setContentView(R.layout.activity_add_daily_entry);
         LinearLayout proportionView = findViewById(R.id.proportionView);
         calories = (EditText) findViewById(R.id.calcCalories);
+        units = findViewById(R.id.units);
+        unitsString = units.getText().toString();//defaults to "g"
         intent = getIntent();
+        unitToggle = findViewById(R.id.unitToggle);
         sharedPreferences = getSharedPreferences("MyPREFERENCES", Context.MODE_PRIVATE);
         focusedDate = sharedPreferences.getString("focusedDate","string");
         LinearLayout massFromScaleLayout = findViewById(R.id.massFromScaleLayout);
@@ -73,6 +82,27 @@ public class addDailyEntry extends AppCompatActivity {
         massSeenByUser = (EditText) findViewById(R.id.massSeenByUser);
         db = smartscaleDBHelper.getReadableDatabase();
         setCaloriesLeft();
+        if(isCountEntry)
+        {
+            unitsString = ""; units.setText(""); unitToggle.setVisibility(View.GONE);
+        }
+        massSeenByUser.addTextChangedListener(new TextWatcher() {
+
+            @Override
+            public void afterTextChanged(Editable s) {}
+
+            @Override
+            public void beforeTextChanged(CharSequence s, int start,
+                                          int count, int after) {
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start,
+                                      int before, int count) {
+                if(s.toString().contentEquals("")) emptyEntryMass = true;
+                calcCalories();
+            }
+        });
         if(!isProportionEntry) {
             proportionView.setVisibility(View.GONE);
             foodID = intent.getIntExtra("id", 0);
@@ -80,11 +110,11 @@ public class addDailyEntry extends AppCompatActivity {
                     , "_id = ?", new String[]{Integer.toString(foodID)}, null, null, null);
             if (cursor.moveToFirst()) {
                 food = cursor.getString(0);
-                double mass = Double.parseDouble(cursor.getString(1));
-                double calories = Double.parseDouble(cursor.getString(2));
+                double mass = cursor.getInt(1);
+                double calories = cursor.getInt(2);
                 int count = cursor.getInt(3);
-                calCountRatio = calories/count;
-                calMassRatio = calories / mass;
+                if (isCountEntry) calCountRatio = calories/count;
+                else calMassRatioG = calories / mass;
             }
             dbText.setText(food);
             cursor.close();
@@ -114,7 +144,12 @@ public class addDailyEntry extends AppCompatActivity {
             proportionData.add("token string for logic purposes in insertDailyEntry");
         }
     }
-
+    public void toggleUnits(View view)
+    {
+        if(unitsString.contentEquals("g")) {units.setText("oz"); unitsString = "oz";}
+        else {units.setText("g"); unitsString = "g";}
+        calcCalories();
+    }
     public void updateMassSeenByUser(View view)
     {
         if(isCompleteDelayedMeasurement)
@@ -140,33 +175,32 @@ public class addDailyEntry extends AppCompatActivity {
         food = proportionData.get(0);
         double mass = Double.parseDouble(proportionData.get(2));
         double calories = Double.parseDouble(proportionData.get(3));
-        calMassRatio = calories/mass;
+        calMassRatioG = calories/mass;
         double fractionOfTotalCalories = Double.parseDouble(proportionData.get(1))/sumOfRatios;
         proportionData.subList(0,5).clear();
         propEntryValue.setText(String.format("%.1f", fractionOfTotalCalories*totalCaloriesBeingProportioned));
         dbText.setText(food);
     }
 
-    public void calcCalories(View view)
+    public void calcCalories()
     {
-        strEntryMass = massSeenByUser.getText().toString();
-        entryMass = Double.parseDouble(strEntryMass);
+        if (emptyEntryMass) entryMass = 0;
+        else entryMass = Double.parseDouble(massSeenByUser.getText().toString());
 
         if(isCountEntry) entryCalories = calCountRatio*entryMass;
-        else entryCalories = calMassRatio*entryMass;
+        else if (unitsString.contentEquals("g")) entryCalories = calMassRatioG*entryMass;
+        else entryCalories = calMassRatioG*28.35*entryMass;
 
-        strEntryCalories = String.format("%.1f", entryCalories);
-        strEntryMass = String.format("%.1f", entryMass);
-        calories.setText(strEntryCalories);
-        strCalLeft = String.format("%.1f", currentCalLeft-entryCalories);
-        calLeft.setText(strCalLeft);
+        calories.setText(String.format("%.1f", entryCalories));
+        calLeft.setText(String.format("%.1f", currentCalLeft-entryCalories));
+        emptyEntryMass = false;
     }
 
     public void insertDailyEntry(View view)
     {
         if(intent.getBooleanExtra("isDelayedMeasurement",false))
         {
-            SmartscaleDatabaseHelper.insertDelayedMeasurement(db,foodID,entryMass);
+            SmartscaleDatabaseHelper.insertDelayedMeasurement(db,foodID,entryMass,unitsString);
             Intent newIntent = new Intent(this, MainActivity.class);
             startActivity(newIntent);
         }
@@ -175,7 +209,7 @@ public class addDailyEntry extends AppCompatActivity {
             ContentValues contentValues = new ContentValues();
             contentValues.put("calConsumed", calConsumedToday + entryCalories);
             db.update("calories", contentValues, "date=?", new String[]{focusedDate});
-            SmartscaleDatabaseHelper.insertEntry(db, food, focusedDate, strEntryMass, strEntryCalories);
+            SmartscaleDatabaseHelper.insertEntry(db, food, focusedDate, entryMass, unitsString, entryCalories);
             if (!isProportionEntry || proportionData.isEmpty()) {
                 if(isCompleteDelayedMeasurement)
                     db.delete("delayedEntries","foodID = ?", new String[] {Integer.toString(foodID)} );
@@ -199,6 +233,9 @@ public class addDailyEntry extends AppCompatActivity {
         for(int i = 1; i < proportionData.size() ; i += 5 )
             sumOfRatios += Double.parseDouble(proportionData.get(i));
         totalCaloriesBeingProportioned = entryCalories*(sumOfRatios/firstEntryRatio);
+        units.setText("g");
+        unitsString = "g";
+        unitToggle.setVisibility(View.VISIBLE);
         proportionedEntry();
     }
 }

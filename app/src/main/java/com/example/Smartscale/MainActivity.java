@@ -85,35 +85,12 @@ public class MainActivity extends AppCompatActivity {
         setCalGoalAndLeft(focusedDate);
         displayDate(focusedDate);
 
-        cursor = db.query("Foodlog", new String[] {"_id","food","calories","mass"},"date = ?",new String[] {createDateString(focusedDate,true)}
+        cursor = db.query("Foodlog", new String[] {"_id","food","calories","mass","massUnit"},"date = ?",new String[] {createDateString(focusedDate,true)}
                 ,null,null,null);
 
-        adapter = new SimpleCursorAdapter(this, R.layout.food_log_item ,cursor,
-        new String[] {"food","calories","mass"},
-        new int[] {R.id.food, R.id.calories, R.id.mass}, 0);
-
+        foodLogAdapter adapter = new foodLogAdapter(this,cursor);
 
         list.setAdapter(adapter);
-
-
-
-        //Create the listener
-        AdapterView.OnItemClickListener itemClickListener =
-                new AdapterView.OnItemClickListener(){
-                    @Override
-                    public void onItemClick(AdapterView<?> list,
-                                            View itemView,
-                                            int position,
-                                            long id) {
-                        //Pass the drink the user clicks on to DrinkActivity
-                        Intent intent = new Intent(MainActivity.this, DeleteDailyEntry.class);
-                        intent.putExtra("id", (int) id);
-                        startActivity(intent);
-                    }
-                };
-
-        //Assign the listener to the list view
-        list.setOnItemClickListener(itemClickListener);
     }
 
     static public Calendar parseDateStringToCalendar(String dateString)

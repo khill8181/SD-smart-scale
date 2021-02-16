@@ -52,8 +52,8 @@ public class chooseFood extends AppCompatActivity {
                 "mass", "calories", "count"},null,null,null,null,null);
 
         adapter = new SimpleCursorAdapter(this, R.layout.food_log_item ,cursor,
-                new String[] {"food","calories"},
-                new int[] {R.id.food, R.id.calories}, 0);
+                new String[] {"food","calories","mass"},
+                new int[] {R.id.food, R.id.calories, R.id.mass}, 0);
 
         list.setAdapter(adapter);
 
@@ -169,9 +169,9 @@ public class chooseFood extends AppCompatActivity {
                         currentIndex = rawText.indexOf("food_name",currentIndex) + 12;
                         food.foodName = rawText.substring(currentIndex,rawText.indexOf('\"',currentIndex));
                         currentIndex = rawText.indexOf("\"attr_id\":207",currentIndex) + 24;
-                        food.calories = Double.parseDouble(rawText.substring(currentIndex,rawText.indexOf(',',currentIndex)));
+                        food.calories = Math.round(Float.parseFloat(rawText.substring(currentIndex,rawText.indexOf(',',currentIndex))));
                         currentIndex = rawText.indexOf("serving_weight_grams",currentIndex) + "erving_weight_grams\":1".length();
-                        food.mass = Double.parseDouble(rawText.substring(currentIndex,rawText.indexOf(',',currentIndex)));
+                        food.mass = Integer.parseInt(rawText.substring(currentIndex,rawText.indexOf(',',currentIndex)));
                         searchResults.add(food);
                         //testing to see if any foods left
                         currentIndex = rawText.indexOf("food_name",currentIndex);
@@ -187,9 +187,9 @@ public class chooseFood extends AppCompatActivity {
                                                         View itemView,
                                                         int position,
                                                         long id) {
-                                    int dbID = (int) SmartscaleDatabaseHelper.insertNewFood(db,array[position].foodName,String.format("%.1f",
-                                                                            array[position].mass),
-                                                                            String.format("%.1f",array[position].calories),0);
+                                    int dbID = (int) SmartscaleDatabaseHelper.insertNewFood(db,array[position].foodName,
+                                                                            array[position].mass,
+                                                                            array[position].calories,0);
                                     Intent intent = new Intent(chooseFood.this, addDailyEntry.class);
                                     intent.putExtra("id", (int) dbID);
                                     startActivity(intent);
@@ -209,25 +209,6 @@ public class chooseFood extends AppCompatActivity {
 
     }
 
-    /*
-    public void addFoodEntryToDB(View view)
-    {
-        SQLiteOpenHelper smartscaleDBHelper = new SmartscaleDatabaseHelper(this);
-        Intent intent = new Intent(this, MainActivity.class);
-        EditText food = (EditText) findViewById(R.id.food1);
-        EditText calories = (EditText) findViewById(R.id.calorie1);
-        int calInt = Integer.parseInt(calories.getText().toString());
-        String foodString = food.getText().toString();
-        try {
-            db = smartscaleDBHelper.getReadableDatabase();
-            SmartscaleDatabaseHelper.insertEntry(db, foodString, 3.33, calInt);
-        }
-        catch(SQLiteException e){
-            Toast toast = Toast.makeText(this,
-                    "DB unavailable", Toast.LENGTH_SHORT);
-            toast.show();
-        }
-        startActivity(intent);
-    }*/
+
 
 }

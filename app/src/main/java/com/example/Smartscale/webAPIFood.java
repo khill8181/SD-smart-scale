@@ -2,8 +2,8 @@ package com.example.Smartscale;
 
 public class webAPIFood {
         String foodName;
-        double calories;
-        double mass;
+        int calories;
+        int mass;
 
 public String toString()
 {

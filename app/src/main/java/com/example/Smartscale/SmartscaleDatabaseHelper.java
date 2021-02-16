@@ -23,22 +23,23 @@ public class SmartscaleDatabaseHelper extends SQLiteOpenHelper {
                     + "_id INTEGER PRIMARY KEY AUTOINCREMENT, "
                     + "food TEXT, "
                     + "date TEXT, "
-                    + "mass text, "
-                    + "calories text);");
+                    + "mass real, "
+                    + "massUnit text,"
+                    + "calories real);");
 
         db.execSQL("CREATE TABLE Foodlist ("
                 +"_id integer primary key autoincrement, "
                 +"food text, "
-                +"mass text, "
-                +"calories text, "
+                +"mass integer, "
+                +"calories integer, "
                 +"count integer);");
 
         db.execSQL("create table calories (date text primary key, calGoal integer, calConsumed real);");
-        db.execSQL("create table delayedEntries (_id integer primary key autoincrement, foodID integer, mass real)");
-        insertNewFood(db, "popcorn", "1.2","5.6",3);
-        insertNewFood(db, "corn", "3.6","4.8",0);
-        insertNewFood(db, "pop", "9.6","3.8",0);
-        insertNewFood(db, "opcor", "4.2","1.7",1);
+        db.execSQL("create table delayedEntries (_id integer primary key autoincrement, foodID integer, mass real, massUnit text)");
+        insertNewFood(db, "popcorn", 2,10,3);
+        insertNewFood(db, "corn", 3,20,0);
+        insertNewFood(db, "pop", 4,15,0);
+        insertNewFood(db, "opcor", 6,25,1);
 
 
     }
@@ -47,11 +48,12 @@ public class SmartscaleDatabaseHelper extends SQLiteOpenHelper {
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion){
     }
 
-    public static void insertDelayedMeasurement(SQLiteDatabase db, int foodID, double mass)
+    public static void insertDelayedMeasurement(SQLiteDatabase db, int foodID, double mass, String massUnit)
     {
         ContentValues entryValues = new ContentValues();
         entryValues.put("foodID",foodID);
         entryValues.put("mass",mass);
+        entryValues.put("massUnit",massUnit);
         db.insert("delayedEntries",null,entryValues);
     }
 
@@ -59,34 +61,24 @@ public class SmartscaleDatabaseHelper extends SQLiteOpenHelper {
     public static void insertEntry(SQLiteDatabase db,
                                     String food,
                                     String date,
-                                    String mass,
-                                    String calories) {
+                                    double mass,
+                                    String massUnit,
+                                    double calories) {
         ContentValues entryValues = new ContentValues();
         entryValues.put("food", food);
         entryValues.put("date", date);
         entryValues.put("mass", mass);
+        entryValues.put("massUnit", massUnit);
         entryValues.put("calories", calories);
         db.insert("Foodlog", null, entryValues);
     }
 
-    public static void insertEntryTesting(SQLiteDatabase db,
-                                   String food,
-                                   Calendar date,
-                                   String mass,
-                                   String calories) {
-        ContentValues entryValues = new ContentValues();
-        entryValues.put("food", food);
-        entryValues.put("date", MainActivity.createDateString(date,true));
-        entryValues.put("mass", mass);
-        entryValues.put("calories", calories);
-        db.insert("Foodlog", null, entryValues);
-    }
 
     //food table
     public static long insertNewFood(SQLiteDatabase db,
                                    String food,
-                                   String mass,
-                                   String calories,
+                                   int mass,
+                                   int calories,
                                    int count) {
         ContentValues entryValues = new ContentValues();
         entryValues.put("food", food);

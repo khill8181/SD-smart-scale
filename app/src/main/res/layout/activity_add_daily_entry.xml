@@ -44,21 +44,42 @@
                 android:text="Update mass seen by user" />
         </LinearLayout>
 
-        <EditText
-            android:id="@+id/massSeenByUser"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:ems="10"
-            android:hint="mass"
-            android:inputType="numberDecimal"
-            android:textSize="36sp" />
+        <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
 
-        <Button
-            android:id="@+id/button5"
+            <EditText
+                android:id="@+id/massSeenByUser"
+                android:layout_width="309dp"
+                android:layout_height="wrap_content"
+                android:ems="10"
+                android:inputType="numberDecimal"
+                android:textAlignment="textEnd"
+                android:textSize="36sp" />
+
+            <TextView
+                android:id="@+id/units"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="g"
+                android:textSize="18sp" />
+        </LinearLayout>
+        <LinearLayout
+            android:id="@+id/blah"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:onClick="calcCalories"
-            android:text="submit mass" />
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/unitToggle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:onClick="toggleUnits"
+                android:text="g/oz" />
+        </LinearLayout>
 
         <LinearLayout
             android:layout_width="match_parent"

@@ -39,7 +39,7 @@ public class DeleteDailyEntry extends AppCompatActivity {
         Cursor cursor = db.query("Foodlog",new String[]{"calories"}, "_id=?",new String[]{Integer.toString(intNum)},
                             null,null,null);
         cursor.moveToFirst();
-        double deletedCalories = Double.parseDouble(cursor.getString(0));
+        double deletedCalories = cursor.getDouble(0);
        //Note that deletions can only be made for the current day
         String focusedDate = sharedPreferences.getString("focusedDate","string");
         Cursor secondCursor = db.query("calories", new String[]{"calConsumed"},"date=?",
