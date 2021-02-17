@@ -51,7 +51,7 @@
 
             <EditText
                 android:id="@+id/massSeenByUser"
-                android:layout_width="309dp"
+                android:layout_width="324dp"
                 android:layout_height="wrap_content"
                 android:ems="10"
                 android:inputType="numberDecimal"
@@ -71,6 +71,13 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/tareButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Tare" />
 
             <Button
                 android:id="@+id/unitToggle"
@@ -108,40 +115,40 @@
         <LinearLayout
             android:id="@+id/proportionView"
             android:layout_width="match_parent"
-            android:layout_height="71dp"
+            android:layout_height="40dp"
             android:orientation="horizontal">
 
             <TextView
                 android:id="@+id/propEntryText"
                 android:layout_width="17dp"
-                android:layout_height="46dp"
+                android:layout_height="match_parent"
                 android:layout_weight="1"
                 android:text="Proportioned portion" />
 
             <TextView
                 android:id="@+id/propEntryValue"
                 android:layout_width="wrap_content"
-                android:layout_height="44dp"
+                android:layout_height="match_parent"
                 android:layout_weight="1"
                 android:text="TextView" />
         </LinearLayout>
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="54dp"
+            android:layout_height="40dp"
             android:orientation="horizontal">
 
             <TextView
                 android:id="@+id/textView3"
                 android:layout_width="41dp"
-                android:layout_height="40dp"
+                android:layout_height="match_parent"
                 android:layout_weight="1"
                 android:text="Calories left" />
 
             <TextView
                 android:id="@+id/calLeftAddingEntry"
                 android:layout_width="wrap_content"
-                android:layout_height="38dp"
+                android:layout_height="match_parent"
                 android:layout_weight="1"
                 android:text="TextView" />
         </LinearLayout>

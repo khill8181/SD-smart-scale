@@ -4,7 +4,9 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".chooseFood">
+    tools:context=".chooseFood"
+    android:descendantFocusability="beforeDescendants"
+    android:focusableInTouchMode="true">
 
 
     <LinearLayout
@@ -15,6 +17,7 @@
         tools:layout_editor_absoluteY="235dp">
 
         <LinearLayout
+            android:id="@+id/searchBarLayout"
             android:layout_width="match_parent"
             android:layout_height="51dp"
             android:orientation="horizontal">
@@ -23,6 +26,8 @@
                 android:id="@+id/searchBar"
                 android:layout_width="331dp"
                 android:layout_height="wrap_content"
+                android:cursorVisible="false"
+                android:editable="false"
                 android:ems="10"
                 android:hint="Search for food"
                 android:inputType="textPersonName" />
@@ -37,7 +42,7 @@
         </LinearLayout>
 
         <Button
-            android:id="@+id/button10"
+            android:id="@+id/addPropComboButton"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:onClick="proportionedFoodSelection"
@@ -51,16 +56,22 @@
             android:text="Submit combo" />
 
         <Button
-            android:id="@+id/button2"
+            android:id="@+id/addByCountBttn"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:onClick="listCountableFoods"
             android:text="Add by count" />
 
+        <TextView
+            android:id="@+id/noResultsView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="No results" />
+
         <ListView
             android:id="@+id/foodList"
             android:layout_width="match_parent"
-            android:layout_height="479dp" />
+            android:layout_height="wrap_content" />
 
     </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

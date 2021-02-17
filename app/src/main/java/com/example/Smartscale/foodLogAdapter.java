@@ -27,8 +27,8 @@ public class foodLogAdapter extends CursorAdapter {
     @Override
     public void bindView(View view, Context context, Cursor cursor) {
         TextView food = (TextView) view.findViewById(R.id.food);
-        TextView calories = (TextView) view.findViewById(R.id.calories);
-        TextView mass = (TextView) view.findViewById(R.id.mass);
+        TextView amounts = (TextView) view.findViewById(R.id.amounts);
+        //TextView mass = (TextView) view.findViewById(R.id.mass);
         String foodString = cursor.getString(cursor.getColumnIndex("food"));
         String caloriesString = String.format("%.1f", cursor.getDouble(cursor.getColumnIndex("calories")));
         String massUnit = cursor.getString(4);
@@ -36,7 +36,7 @@ public class foodLogAdapter extends CursorAdapter {
         if(massUnit.contentEquals("")) massString = massString.substring(0,massString.indexOf('.'));
         int id = cursor.getInt(0);
         massString+=massUnit;
-        food.setText(foodString); calories.setText(caloriesString); mass.setText(massString);
+        food.setText(foodString); amounts.setText(caloriesString); //mass.setText(massString);
         view.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

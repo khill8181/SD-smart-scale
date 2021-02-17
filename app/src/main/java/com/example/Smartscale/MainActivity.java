@@ -24,7 +24,7 @@ public class MainActivity extends AppCompatActivity {
     public static final String EXTRA_MESSAGE = "com.example.Smartscale.MESSAGE";
     private SQLiteDatabase db;
     private Cursor cursor;
-    SimpleCursorAdapter adapter;
+    foodLogAdapter adapter;
     Calendar currentDate, focusedDate;
     TextView date;
     ListView list;
@@ -88,7 +88,7 @@ public class MainActivity extends AppCompatActivity {
         cursor = db.query("Foodlog", new String[] {"_id","food","calories","mass","massUnit"},"date = ?",new String[] {createDateString(focusedDate,true)}
                 ,null,null,null);
 
-        foodLogAdapter adapter = new foodLogAdapter(this,cursor);
+        adapter = new foodLogAdapter(this,cursor);
 
         list.setAdapter(adapter);
     }
@@ -151,7 +151,7 @@ public class MainActivity extends AppCompatActivity {
         {
             rollBackward(focusedDate);
             editor.putString("focusedDate",createDateString(focusedDate,true));
-            Cursor newCursor = db.query("Foodlog", new String[]{"_id", "food", "calories","mass"}, "date = ?", new String[]{createDateString(focusedDate, true)}
+            Cursor newCursor = db.query("Foodlog", new String[]{"_id", "food", "calories","mass","massUnit"}, "date = ?", new String[]{createDateString(focusedDate, true)}
                     , null, null, null);
             adapter.changeCursor(newCursor);
             displayDate(focusedDate);
@@ -182,7 +182,7 @@ public class MainActivity extends AppCompatActivity {
         {
             rollForward(focusedDate);
             editor.putString("focusedDate",createDateString(focusedDate,true));
-            Cursor newCursor = db.query("Foodlog", new String[] {"_id","food","calories","mass"},"date = ?",new String[] {createDateString(focusedDate,true)}
+            Cursor newCursor = db.query("Foodlog", new String[] {"_id","food","calories","mass","massUnit"},"date = ?",new String[] {createDateString(focusedDate,true)}
                     ,null,null,null);
             adapter.changeCursor(newCursor);
             displayDate(focusedDate);

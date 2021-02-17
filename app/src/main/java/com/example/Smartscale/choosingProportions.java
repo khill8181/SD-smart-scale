@@ -9,6 +9,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.Button;
 import android.widget.CheckedTextView;
 import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
@@ -22,10 +23,19 @@ public class choosingProportions extends AppCompatActivity {
     Cursor cursor;
     SQLiteDatabase db;
     int foodCount;
+    Button restOfCalButton;
+    Button chooseCalAmtBttn;
+    Button chooseCountableBttn;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_choosing_proportions);
+        restOfCalButton = findViewById(R.id.restOfCal);
+        chooseCalAmtBttn = findViewById(R.id.chooseCalAmount);
+        chooseCountableBttn = findViewById(R.id.chooseCountable);
+        restOfCalButton.setEnabled(false);
+        chooseCalAmtBttn.setEnabled(false);
+        chooseCountableBttn.setEnabled(false);
         data = new ArrayList<String>();
         SQLiteOpenHelper smartscaleDBHelper = new SmartscaleDatabaseHelper(this);
         db = smartscaleDBHelper.getReadableDatabase();
@@ -54,7 +64,13 @@ public class choosingProportions extends AppCompatActivity {
             public void onLoseFocus(String food, String proportion, String mass, String calories, String count) {
                 if (!data.contains(food)) {data.add(food);data.add(proportion);data.add(mass);data.add(calories);data.add(count);}
                 else if (data.get(data.indexOf(food) + 1) != proportion) data.set(data.indexOf(food)+1,proportion);
+                if(data.size()/5 == foodCount)
+                {
+                    restOfCalButton.setEnabled(true);
+                    chooseCalAmtBttn.setEnabled(true);
+                    chooseCountableBttn.setEnabled(true);
                 }
+            }
         });
 
     }
@@ -65,8 +81,8 @@ public class choosingProportions extends AppCompatActivity {
         if (view.getId() == R.id.restOfCal)
         {
             Intent intent = new Intent(this, addDailyEntry.class);
-            intentChooserHelperForsubmitProportions(intent);
             intent.putExtra("isProportionEntry",true);
+            intentChooserHelperForsubmitProportions(intent);
         }
         if (view.getId() == R.id.chooseCalAmount){
             Intent intent = new Intent(this, chooseCalAmount.class);

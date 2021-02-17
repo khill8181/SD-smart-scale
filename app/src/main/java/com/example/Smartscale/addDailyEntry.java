@@ -56,6 +56,7 @@ public class addDailyEntry extends AppCompatActivity {
     String unitsString;
     Button unitToggle;
     boolean emptyEntryMass = false;
+    Button tareButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,6 +65,7 @@ public class addDailyEntry extends AppCompatActivity {
         LinearLayout proportionView = findViewById(R.id.proportionView);
         calories = (EditText) findViewById(R.id.calcCalories);
         units = findViewById(R.id.units);
+        tareButton = findViewById(R.id.tareButton);
         unitsString = units.getText().toString();//defaults to "g"
         intent = getIntent();
         unitToggle = findViewById(R.id.unitToggle);
@@ -84,7 +86,9 @@ public class addDailyEntry extends AppCompatActivity {
         setCaloriesLeft();
         if(isCountEntry)
         {
-            unitsString = ""; units.setText(""); unitToggle.setVisibility(View.GONE);
+
+            unitsString = ""; units.setVisibility(View.GONE); unitToggle.setVisibility(View.GONE);
+            tareButton.setVisibility(View.GONE);
         }
         massSeenByUser.addTextChangedListener(new TextWatcher() {
 
@@ -172,6 +176,7 @@ public class addDailyEntry extends AppCompatActivity {
 
     public void proportionedEntry()
     {
+        massSeenByUser.setText("");
         food = proportionData.get(0);
         double mass = Double.parseDouble(proportionData.get(2));
         double calories = Double.parseDouble(proportionData.get(3));
@@ -233,9 +238,9 @@ public class addDailyEntry extends AppCompatActivity {
         for(int i = 1; i < proportionData.size() ; i += 5 )
             sumOfRatios += Double.parseDouble(proportionData.get(i));
         totalCaloriesBeingProportioned = entryCalories*(sumOfRatios/firstEntryRatio);
-        units.setText("g");
         unitsString = "g";
-        unitToggle.setVisibility(View.VISIBLE);
+        unitToggle.setVisibility(View.VISIBLE);units.setVisibility(View.VISIBLE);
+        tareButton.setVisibility(View.VISIBLE);
         proportionedEntry();
     }
 }
