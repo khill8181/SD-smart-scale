@@ -50,6 +50,13 @@
             android:onClick="submitSelections"
             android:text="Submit combo" />
 
+        <Button
+            android:id="@+id/button2"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:onClick="listCountableFoods"
+            android:text="Add by count" />
+
         <ListView
             android:id="@+id/foodList"
             android:layout_width="match_parent"
