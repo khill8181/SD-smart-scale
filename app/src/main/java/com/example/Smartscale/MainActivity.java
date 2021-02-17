@@ -8,17 +8,33 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
+import android.os.Message;
+import android.util.Log;
 import android.widget.AdapterView;
+import android.widget.Button;
 import android.widget.ListView;
 import android.view.View;
 import android.widget.SimpleCursorAdapter;
 import android.widget.TextView;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+
 import java.util.Calendar;
 //import androidx.appcompat.widget.Toolbar;
 import android.widget.Toolbar;
 import java.util.List;
+
+import java.util.UUID;
+
+
 import retrofit2.Call;
 import retrofit2.Retrofit;
+
+import static android.content.ContentValues.TAG;
 
 public class MainActivity extends AppCompatActivity {
     public static final String EXTRA_MESSAGE = "com.example.Smartscale.MESSAGE";
@@ -88,7 +104,26 @@ public class MainActivity extends AppCompatActivity {
         cursor = db.query("Foodlog", new String[] {"_id","food","calories","mass","massUnit"},"date = ?",new String[] {createDateString(focusedDate,true)}
                 ,null,null,null);
 
+
         adapter = new foodLogAdapter(this,cursor);
+
+        //Create the listener
+        AdapterView.OnItemClickListener itemClickListener =
+                new AdapterView.OnItemClickListener(){
+                    @Override
+                    public void onItemClick(AdapterView<?> list,
+                                            View itemView,
+                                            int position,
+                                            long id) {
+                        //Pass the drink the user clicks on to DrinkActivity
+                        Intent intent = new Intent(MainActivity.this, DeleteDailyEntry.class);
+                        intent.putExtra("id", (int) id);
+                        startActivity(intent);
+                    }
+                };
+
+        //Assign the listener to the list view
+        list.setOnItemClickListener(itemClickListener);
 
         list.setAdapter(adapter);
     }
@@ -101,6 +136,7 @@ public class MainActivity extends AppCompatActivity {
         parsedDate.set(Calendar.DAY_OF_MONTH, Integer.parseInt(dateString.substring(index + 1, dateString.lastIndexOf('-'))));
         parsedDate.set(Calendar.YEAR, 2021);
         return parsedDate;
+
     }
 
     public void setCalGoalAndLeft(Calendar date)
@@ -213,5 +249,6 @@ public class MainActivity extends AppCompatActivity {
 
 
     }
+
 
 }
