@@ -10,9 +10,12 @@ import android.os.Looper;
 import android.os.Message;
 import android.util.Log;
 import android.widget.Button;
-
 import static android.content.ContentValues.TAG;
-
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.util.ArrayList;
+import java.util.UUID;
 
 //
 import android.content.Context;
@@ -27,11 +30,7 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.util.ArrayList;
-import java.util.UUID;
+
 
 
 public class addDailyEntry extends AppCompatActivity {
