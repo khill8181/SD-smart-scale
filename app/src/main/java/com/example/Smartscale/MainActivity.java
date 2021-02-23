@@ -1,5 +1,6 @@
 package com.example.Smartscale;
 
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import android.content.Context;
 import android.content.Intent;
@@ -7,6 +8,7 @@ import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -25,6 +27,7 @@ import java.io.OutputStream;
 
 import java.util.Calendar;
 //import androidx.appcompat.widget.Toolbar;
+import android.widget.Toast;
 import android.widget.Toolbar;
 import java.util.List;
 
@@ -126,6 +129,20 @@ public class MainActivity extends AppCompatActivity {
         list.setOnItemClickListener(itemClickListener);
 
         list.setAdapter(adapter);
+
+
+        //// Open Bluetooth for the first time
+        Boolean isFirstRun = getSharedPreferences("PREFERENCE", MODE_PRIVATE)
+                .getBoolean("isFirstRun", true);
+
+        if (isFirstRun) {
+            //show start activity
+            startActivity(new Intent(MainActivity.this, SelectDeviceActivity.class));
+        }
+
+        getSharedPreferences("PREFERENCE", MODE_PRIVATE).edit()
+                .putBoolean("isFirstRun", false).commit();
+        ////
     }
 
     static public Calendar parseDateStringToCalendar(String dateString)
