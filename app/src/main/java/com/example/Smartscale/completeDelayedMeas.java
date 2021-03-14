@@ -26,8 +26,8 @@ public class completeDelayedMeas extends AppCompatActivity {
         ListView listView = findViewById(R.id.listOfIncompleteMeas);
         SQLiteOpenHelper smartscaleDBHelper = new SmartscaleDatabaseHelper(this);
         db = smartscaleDBHelper.getReadableDatabase();
-        cursor = db.rawQuery("select delayedEntries._id,Foodlist.food,delayedEntries.foodID,delayedEntries.mass from Foodlist " +
-                "inner join delayedEntries on Foodlist._id=delayedEntries.foodID",null);
+        cursor = db.rawQuery("select delayedEntries._id,Foodlist.food,delayedEntries.foodID,delayedEntries.mass,delayedEntries.mealTime" +
+                " from Foodlist inner join delayedEntries on Foodlist._id=delayedEntries.foodID",null);
 
         completeDelayedMeasAdapter adapter = new completeDelayedMeasAdapter(this,cursor);
         listView.setAdapter(adapter);

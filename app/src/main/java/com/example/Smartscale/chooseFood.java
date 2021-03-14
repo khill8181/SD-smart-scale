@@ -45,11 +45,13 @@ public class chooseFood extends AppCompatActivity {
     Button addByCountBttn;
     LinearLayout searchBarLayout;
     static boolean onMainPage = true;
+    Intent oldIntent;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_choose_food2);
+        oldIntent = getIntent();
         onMainPage = true;
         addPropComboBttn = findViewById(R.id.addPropComboButton);
         noResultsView = findViewById(R.id.noResultsView);
@@ -62,10 +64,12 @@ public class chooseFood extends AppCompatActivity {
         list = (ListView) findViewById(R.id.foodList);
         SQLiteOpenHelper smartscaleDBHelper = new SmartscaleDatabaseHelper(this);
         db = smartscaleDBHelper.getReadableDatabase();
+        //messing around with stupid blinking cursor
         searchedTermView.setOnFocusChangeListener(new View.OnFocusChangeListener() {
             @Override
             public void onFocusChange(View v, boolean hasFocus) {
                 if (!hasFocus) searchedTermView.clearFocus();}});
+
         cursor = db.query("Foodlist", new String[] {"_id","food",
                 "mass", "calories", "count"},null,null,null,null,null);
 
@@ -84,7 +88,6 @@ public class chooseFood extends AppCompatActivity {
                                             int position,
                                             long id) {
                         //Pass the drink the user clicks on to DrinkActivity
-                        Intent oldIntent = getIntent();
                         Intent intent = new Intent(chooseFood.this, addDailyEntry.class);
                         intent.putExtra("id", (int) id);
                         intent.putExtra("isDelayedMeasurement",oldIntent.getBooleanExtra("isDelayedMeasurement",false));

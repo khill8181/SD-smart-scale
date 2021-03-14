@@ -243,6 +243,7 @@ public class addDailyEntry extends AppCompatActivity {
 
         /////////////////////////////////////////////////////////////////////////////
     }
+
     public void toggleUnits(View view)
     {
         if(unitsString.contentEquals("g")) {units.setText("oz"); unitsString = "oz";}
@@ -298,9 +299,11 @@ public class addDailyEntry extends AppCompatActivity {
 
     public void insertDailyEntry(View view)
     {
+        String mealTime = sharedPreferences.getString("mealTime","string");
+        if(isCompleteDelayedMeasurement) mealTime = intent.getStringExtra("mealTime");
         if(intent.getBooleanExtra("isDelayedMeasurement",false))
         {
-            SmartscaleDatabaseHelper.insertDelayedMeasurement(db,foodID,entryMass,unitsString);
+            SmartscaleDatabaseHelper.insertDelayedMeasurement(db,foodID,entryMass,unitsString,mealTime);
             Intent newIntent = new Intent(this, MainActivity.class);
             startActivity(newIntent);
         }
@@ -309,7 +312,7 @@ public class addDailyEntry extends AppCompatActivity {
             ContentValues contentValues = new ContentValues();
             contentValues.put("calConsumed", calConsumedToday + entryCalories);
             db.update("calories", contentValues, "date=?", new String[]{focusedDate});
-            SmartscaleDatabaseHelper.insertEntry(db, food, focusedDate, entryMass, unitsString, entryCalories);
+            SmartscaleDatabaseHelper.insertEntry(db, food, focusedDate, entryMass, unitsString, entryCalories,mealTime);
             if (!isProportionEntry || proportionData.isEmpty()) {
                 if(isCompleteDelayedMeasurement)
                     db.delete("delayedEntries","foodID = ?", new String[] {Integer.toString(foodID)} );
@@ -325,7 +328,20 @@ public class addDailyEntry extends AppCompatActivity {
         }
     }
 
+    public void countComboSetup()
+    {
+        isCountEntry = false;
+        proportionData = intent.getStringArrayListExtra("proportionData");
+        sumOfRatios = firstEntryRatio;
+        for(int i = 1; i < proportionData.size() ; i += 5 )
+            sumOfRatios += Double.parseDouble(proportionData.get(i));
+        totalCaloriesBeingProportioned = entryCalories*(sumOfRatios/firstEntryRatio);
+        unitsString = "g";
+        unitToggle.setVisibility(View.VISIBLE);units.setVisibility(View.VISIBLE);
+        tareButton.setVisibility(View.VISIBLE);
+        proportionedEntry();
 
+    }
     /* ============================ Thread to Create Bluetooth Connection =================================== */
     public static class CreateConnectThread extends Thread {
 
@@ -469,20 +485,5 @@ public class addDailyEntry extends AppCompatActivity {
         a.addCategory(Intent.CATEGORY_HOME);
         a.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         startActivity(a);
-    }
-
-    public void countComboSetup()
-    {
-        isCountEntry = false;
-        proportionData = intent.getStringArrayListExtra("proportionData");
-        sumOfRatios = firstEntryRatio;
-        for(int i = 1; i < proportionData.size() ; i += 5 )
-            sumOfRatios += Double.parseDouble(proportionData.get(i));
-        totalCaloriesBeingProportioned = entryCalories*(sumOfRatios/firstEntryRatio);
-        unitsString = "g";
-        unitToggle.setVisibility(View.VISIBLE);units.setVisibility(View.VISIBLE);
-        tareButton.setVisibility(View.VISIBLE);
-        proportionedEntry();
-
     }
 }

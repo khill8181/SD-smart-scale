@@ -2,6 +2,7 @@ package com.example.Smartscale;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -12,6 +13,7 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 public class completeDelayedMeasAdapter extends CursorAdapter {
+
 
     public completeDelayedMeasAdapter(Context context, Cursor cursor) {
         super(context, cursor, 0);
@@ -29,6 +31,7 @@ public class completeDelayedMeasAdapter extends CursorAdapter {
     @Override
     public void bindView(View view, Context context, Cursor cursor) {
         TextView food = (TextView) view.findViewById(android.R.id.text1);
+        String mealTime = cursor.getString(cursor.getColumnIndex("mealTime"));
         String foodString = cursor.getString(cursor.getColumnIndex("food"));
         int foodID = cursor.getInt(cursor.getColumnIndex("foodID"));
         double initialMeas = cursor.getDouble(cursor.getColumnIndex("mass"));
@@ -40,6 +43,7 @@ public class completeDelayedMeasAdapter extends CursorAdapter {
                 intent.putExtra("id",foodID);
                 intent.putExtra("initialMeasurement",initialMeas);
                 intent.putExtra("isCompleteDelayedMeasurement",true);
+                intent.putExtra("mealTime",mealTime);
                 view.getContext().startActivity(intent);
             }});
     }

@@ -11,9 +11,8 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical"
-        tools:layout_editor_absoluteX="200dp"
-        tools:layout_editor_absoluteY="294dp">
+        android:orientation="vertical">
+
 
         <android.widget.Toolbar
             android:id="@+id/mainToolbar"
@@ -135,12 +134,11 @@
 
 
         <ListView
-            android:id="@+id/dailyEntries"
+            android:id="@+id/breakfastList"
             android:layout_width="match_parent"
-            android:layout_height="match_parent" >
-
-
+            android:layout_height="wrap_content">
         </ListView>
 
     </LinearLayout>
+
 </androidx.constraintlayout.widget.ConstraintLayout>

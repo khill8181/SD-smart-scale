@@ -10,43 +10,28 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Looper;
-import android.os.Message;
-import android.util.Log;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ListView;
 import android.view.View;
-import android.widget.SimpleCursorAdapter;
 import android.widget.TextView;
-
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 
 import java.util.Calendar;
 //import androidx.appcompat.widget.Toolbar;
 import android.widget.Toast;
 import android.widget.Toolbar;
-import java.util.List;
-
-import java.util.UUID;
-
-
-import retrofit2.Call;
-import retrofit2.Retrofit;
-
-import static android.content.ContentValues.TAG;
 
 public class MainActivity extends AppCompatActivity {
     public static final String EXTRA_MESSAGE = "com.example.Smartscale.MESSAGE";
     private SQLiteDatabase db;
-    private Cursor cursor;
-    foodLogAdapter adapter;
+    private Cursor breakfastCursor;
+    //Cursor dinnerCursor;
+    foodLogAdapter breakfastAdapter;
+    foodLogAdapter dinnerAdapter;
     Calendar currentDate, focusedDate;
     TextView date;
-    ListView list;
+    ListView breakfastList;
+    //ListView dinnerList;
     TextView calGoalView;
     TextView calLeftView;
     SharedPreferences sharedpreferences;
@@ -61,7 +46,8 @@ public class MainActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.mainToolbar);
         setActionBar(toolbar);
         SQLiteOpenHelper smartscaleDBHelper = new SmartscaleDatabaseHelper(this);
-        list = (ListView) findViewById(R.id.dailyEntries);
+        breakfastList = (ListView) findViewById(R.id.breakfastList);
+        //dinnerList = findViewById(R.id.dinnerList);
         calGoalView = (TextView) findViewById(R.id.calorieGoal);
         calLeftView = (TextView) findViewById(R.id.caloriesLeft);
         db = smartscaleDBHelper.getReadableDatabase();
@@ -71,12 +57,12 @@ public class MainActivity extends AppCompatActivity {
         currentDate = Calendar.getInstance(); // Returns instance with current date and time set
         if (startUp) {focusedDate = Calendar.getInstance(); editor.putString("focusedDate",createDateString(currentDate,true));}
         else focusedDate = parseDateStringToCalendar(sharedpreferences.getString("focusedDate","string"));
-        //String lastDayOpened = sharedpreferences.getString("lastDayOpened", "never");
-        String lastDayOpened = "1-10-2021";//for testing
+        String lastDayOpened = sharedpreferences.getString("lastDayOpened", "never");
+        //String lastDayOpened = "1-10-2021";//for testing
         String currentDateString = createDateString(currentDate,true);
 
-        editor.putString("oldestDateAvailable", "1-10-2021");//for testing
-        SmartscaleDatabaseHelper.insertCalorieEntry(db, lastDayOpened, 2000, 0);
+        //editor.putString("oldestDateAvailable", "1-10-2021");//for testing
+        //SmartscaleDatabaseHelper.insertCalorieEntry(db, lastDayOpened, 2000, 0);
         if (lastDayOpened == "never" || lastDayOpened != currentDateString)
         {
             if(lastDayOpened == "never") {
@@ -104,11 +90,16 @@ public class MainActivity extends AppCompatActivity {
         setCalGoalAndLeft(focusedDate);
         displayDate(focusedDate);
 
-        cursor = db.query("Foodlog", new String[] {"_id","food","calories","mass","massUnit"},"date = ?",new String[] {createDateString(focusedDate,true)}
-                ,null,null,null);
+        breakfastCursor = db.query("Foodlog", new String[] {"_id","food","calories","mass","massUnit"},
+                "date = ? and mealTime = ?",new String[] {createDateString(focusedDate,true),"breakfast"},
+                null,null,null);
 
+        /*dinnerCursor = db.query("Foodlog", new String[] {"_id","food","calories","mass","massUnit"},
+                "date = ? and mealTime = ?",new String[] {createDateString(focusedDate,true),"dinner"}
+                ,null,null,null);*/
 
-        adapter = new foodLogAdapter(this,cursor);
+        breakfastAdapter = new foodLogAdapter(this,breakfastCursor);
+        //dinnerAdapter = new foodLogAdapter(this,dinnerCursor);
 
         //Create the listener
         AdapterView.OnItemClickListener itemClickListener =
@@ -126,10 +117,28 @@ public class MainActivity extends AppCompatActivity {
                 };
 
         //Assign the listener to the list view
-        list.setOnItemClickListener(itemClickListener);
+        breakfastList.setOnItemClickListener(itemClickListener);
+        //dinnerList.setOnItemClickListener(itemClickListener);
 
-        list.setAdapter(adapter);
+        breakfastList.setAdapter(breakfastAdapter);
+        //dinnerList.setAdapter(dinnerAdapter);
 
+        //Button breakfastEntry = findViewById(R.id.breakfastEntry);
+        //Button dinnerEntry = findViewById(R.id.dinnerEntry);
+        /*View.OnLongClickListener longClickListener = new View.OnLongClickListener(){
+            @Override
+            public boolean onLongClick(View view){
+                Intent intent = new Intent(MainActivity.this, chooseFood.class);
+                if(view.getId() == R.id.breakfastEntry) editor.putString("mealTime", "breakfast");
+                else editor.putString("mealTime","dinner");
+                editor.commit();
+                intent.putExtra("isDelayedMeasurement",true);
+                startActivity(intent);
+                return true;
+            }
+        };
+        breakfastEntry.setOnLongClickListener(longClickListener);*/
+        //dinnerEntry.setOnLongClickListener(longClickListener);
 
         //// Open Bluetooth for the first time
         Boolean isFirstRun = getSharedPreferences("PREFERENCE", MODE_PRIVATE)
@@ -143,6 +152,7 @@ public class MainActivity extends AppCompatActivity {
         getSharedPreferences("PREFERENCE", MODE_PRIVATE).edit()
                 .putBoolean("isFirstRun", false).commit();
         ////
+
     }
 
     static public Calendar parseDateStringToCalendar(String dateString)
@@ -169,7 +179,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public void onDestroy(){
         super.onDestroy();
-        cursor.close();
+        breakfastCursor.close();
         db.close();
     }
 
@@ -204,11 +214,16 @@ public class MainActivity extends AppCompatActivity {
         {
             rollBackward(focusedDate);
             editor.putString("focusedDate",createDateString(focusedDate,true));
-            Cursor newCursor = db.query("Foodlog", new String[]{"_id", "food", "calories","mass","massUnit"}, "date = ?", new String[]{createDateString(focusedDate, true)}
+            Cursor newBreakfastCursor = db.query("Foodlog", new String[]{"_id", "food", "calories","mass","massUnit"},
+                    "date = ? and mealTime = ?", new String[]{createDateString(focusedDate, true),"breakfast"}
                     , null, null, null);
-            adapter.changeCursor(newCursor);
+            breakfastAdapter.changeCursor(newBreakfastCursor);
+            /*Cursor newDinnerCursor = db.query("Foodlog", new String[]{"_id", "food", "calories","mass","massUnit"},
+                    "date = ? and mealTime = ?", new String[]{createDateString(focusedDate, true),"dinner"}
+                    , null, null, null);
+            dinnerAdapter.changeCursor(newDinnerCursor);*/
+
             displayDate(focusedDate);
-            cursor = newCursor;
             setCalGoalAndLeft(focusedDate);
             editor.commit();
         }
@@ -235,11 +250,16 @@ public class MainActivity extends AppCompatActivity {
         {
             rollForward(focusedDate);
             editor.putString("focusedDate",createDateString(focusedDate,true));
-            Cursor newCursor = db.query("Foodlog", new String[] {"_id","food","calories","mass","massUnit"},"date = ?",new String[] {createDateString(focusedDate,true)}
+            Cursor newBreakfastCursor = db.query("Foodlog", new String[] {"_id","food","calories","mass","massUnit"}
+            ,"date = ? and mealTime = ?",new String[] {createDateString(focusedDate,true), "breakfast"}
                     ,null,null,null);
-            adapter.changeCursor(newCursor);
+            breakfastAdapter.changeCursor(newBreakfastCursor);
+            /*Cursor newDinnerCursor = db.query("Foodlog", new String[] {"_id","food","calories","mass","massUnit"}
+                    ,"date = ? and mealTime = ?",new String[] {createDateString(focusedDate,true), "dinner"}
+                    ,null,null,null);
+            dinnerAdapter.changeCursor(newDinnerCursor);*/
+
             displayDate(focusedDate);
-            cursor = newCursor;
             setCalGoalAndLeft(focusedDate);
             editor.commit();
         }
@@ -261,10 +281,10 @@ public class MainActivity extends AppCompatActivity {
     {
 
         Intent intent = new Intent(MainActivity.this, chooseFood.class);
-        if (view.getId() == R.id.begDelMeas) intent.putExtra("isDelayedMeasurement",true);
+        if (view.getId() == R.id.addDailyEntry) editor.putString("mealTime", "breakfast");
+        else editor.putString("mealTime", "dinner");
+        editor.commit();
         startActivity(intent);
-
-
     }
 
 
