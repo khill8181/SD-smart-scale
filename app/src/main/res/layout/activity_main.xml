@@ -9,17 +9,21 @@
     tools:menu="@menu/main_page">
 
     <LinearLayout
+
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical">
-
-
+        <include
+            android:id="@+id/toolbar"
+            layout="@layout/toolbar" />
+        <!--
         <android.widget.Toolbar
             android:id="@+id/mainToolbar"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
             android:background="?attr/colorPrimary"/>
-            <!--android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar" -->
+         -->
+        <!--android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar" -->
 
 
         <LinearLayout
@@ -27,19 +31,29 @@
             android:layout_height="wrap_content"
             android:orientation="horizontal">
 
-            <TextView
-                android:id="@+id/calorieGoal"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="1" />
-
-            <Button
-                android:id="@+id/setCalorieGoal"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
                 android:layout_weight="1"
-                android:onClick="changeGoal"
-                android:text="Set calorie goal" />
+                android:gravity="center"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/calorieGoalLabel"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:text="Calorie Goal: "/>
+
+                <TextView
+                    android:id="@+id/calorieGoal"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:text="calories "/>
+
+            </LinearLayout>
+
         </LinearLayout>
 
         <LinearLayout
@@ -50,9 +64,9 @@
             <LinearLayout
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
-                android:orientation="vertical"
                 android:layout_weight="1"
-                android:gravity="center">
+                android:gravity="center"
+                android:orientation="vertical">
 
                 <TextView
                     android:id="@+id/textView4"
@@ -65,9 +79,8 @@
                     android:id="@+id/caloriesLeft"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="TextView"
                     android:gravity="center"
-                    />
+                    android:text="TextView" />
             </LinearLayout>
 
             <Button

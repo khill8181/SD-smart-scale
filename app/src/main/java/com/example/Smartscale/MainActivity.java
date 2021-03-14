@@ -2,6 +2,8 @@ package com.example.Smartscale;
 
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -10,6 +12,12 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
+import android.os.Message;
+import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ListView;
@@ -17,9 +25,7 @@ import android.view.View;
 import android.widget.TextView;
 
 import java.util.Calendar;
-//import androidx.appcompat.widget.Toolbar;
 import android.widget.Toast;
-import android.widget.Toolbar;
 
 public class MainActivity extends AppCompatActivity {
     public static final String EXTRA_MESSAGE = "com.example.Smartscale.MESSAGE";
@@ -43,8 +49,8 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.mainToolbar);
-        setActionBar(toolbar);
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
         SQLiteOpenHelper smartscaleDBHelper = new SmartscaleDatabaseHelper(this);
         breakfastList = (ListView) findViewById(R.id.breakfastList);
         //dinnerList = findViewById(R.id.dinnerList);
@@ -285,6 +291,33 @@ public class MainActivity extends AppCompatActivity {
         else editor.putString("mealTime", "dinner");
         editor.commit();
         startActivity(intent);
+    }
+
+    ///// Toolbar Menu /////
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.menu_main, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();  // Get the id of the selected item
+
+        // Perform action based on which item was selected
+        if (id == R.id.setCalorieGoal) {
+            changeGoal(findViewById(android.R.id.content).getRootView());
+            return true;
+        }
+        else if (id == R.id.connectScale) {
+            Intent intent = new Intent(MainActivity.this, SelectDeviceActivity.class);
+            startActivity(intent);
+            return true;
+        }
+
+        return super.onOptionsItemSelected(item);
     }
 
 
