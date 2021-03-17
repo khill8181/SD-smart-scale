@@ -43,7 +43,7 @@ public class MainActivity extends AppCompatActivity {
     SharedPreferences sharedpreferences;
     static boolean startUp = true;
     SharedPreferences.Editor editor;
-
+    private String deviceName = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -149,12 +149,18 @@ public class MainActivity extends AppCompatActivity {
         //// Open Bluetooth for the first time
         Boolean isFirstRun = getSharedPreferences("PREFERENCE", MODE_PRIVATE)
                 .getBoolean("isFirstRun", true);
-
+        SharedPreferences btDetail = getSharedPreferences("btDetail", MODE_PRIVATE);
+        SharedPreferences.Editor edit = btDetail.edit();
         if (isFirstRun) {
             //show start activity
             startActivity(new Intent(MainActivity.this, SelectDeviceActivity.class));
         }
-
+        deviceName = btDetail.getString("btName", null);
+        if (deviceName == null && !isFirstRun) {
+            edit.putString("btName", getIntent().getStringExtra("deviceName"));
+            edit.putString("btAddress", getIntent().getStringExtra("deviceAddress"));
+            edit.commit();
+        }
         getSharedPreferences("PREFERENCE", MODE_PRIVATE).edit()
                 .putBoolean("isFirstRun", false).commit();
         ////

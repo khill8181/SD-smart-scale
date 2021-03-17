@@ -51,7 +51,7 @@ public class DeviceListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
         itemHolder.linearLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(context,addDailyEntry.class);
+                Intent intent = new Intent(context,MainActivity.class);
                 // Send device details to the MainActivity
                 intent.putExtra("deviceName", deviceInfoModel.getDeviceName());
                 intent.putExtra("deviceAddress",deviceInfoModel.getDeviceHardwareAddress());

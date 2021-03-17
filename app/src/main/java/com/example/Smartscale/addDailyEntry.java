@@ -74,11 +74,12 @@ public class addDailyEntry extends AppCompatActivity {
     Button tareButton;
 
 
+
     //bluetooth variables
     private String deviceName = null;
     private String deviceAddress;
     public static Handler handler;
-    public static BluetoothSocket mmSocket;
+    public static BluetoothSocket mmSocket = null;
     public static ConnectedThread connectedThread;
     public static CreateConnectThread createConnectThread;
     private final static int CONNECTING_STATUS = 1; // used in bluetooth handler to identify message status
@@ -178,11 +179,12 @@ public class addDailyEntry extends AppCompatActivity {
         //For Bluetooth Connectivity
         final Button buttonConnect = findViewById(R.id.buttonConnect);
         // If a bluetooth device has been selected from SelectDeviceActivity
-
-        deviceName = getIntent().getStringExtra("deviceName");
+        SharedPreferences btDetail = getSharedPreferences("btDetail", MODE_PRIVATE);
+        //deviceName = getIntent().getStringExtra("deviceName");
+        deviceName = btDetail.getString("btName", null);
         if (deviceName != null){
             // Get the device address to make BT Connection
-            deviceAddress = getIntent().getStringExtra("deviceAddress");
+            deviceAddress = btDetail.getString("btAddress", null);
             // Show progress and connection status
             buttonConnect.setText("Connecting to " + deviceName + "...");
             buttonConnect.setEnabled(false);
@@ -215,6 +217,8 @@ public class addDailyEntry extends AppCompatActivity {
                                 break;
                         }
                     case MESSAGE_READ:
+                        buttonConnect.setText("Weigh Mass");
+                        buttonConnect.setEnabled(true);
                         if (msg.obj != null) {
                             btMass = msg.obj.toString();
                             EditText editText = (EditText) findViewById(R.id.massSeenByUser);
@@ -233,11 +237,26 @@ public class addDailyEntry extends AppCompatActivity {
                     Intent intent = new Intent(addDailyEntry.this, SelectDeviceActivity.class);
                     startActivity(intent);
                 }
-                else{
-                    String askWeight = "asking";
-                    connectedThread.write(askWeight);
+                else if (mmSocket != null){
+                    connectedThread.write("r");
                 }
-
+            }
+        });
+        tareButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (mmSocket != null)
+                    connectedThread.write("t");
+            }
+        });
+        unitToggle.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (mmSocket != null)
+                    connectedThread.write("u");
+                if(unitsString.contentEquals("g")) {units.setText("oz"); unitsString = "oz";}
+                else {units.setText("g"); unitsString = "g";}
+                calcCalories();
             }
         });
 
