@@ -11,6 +11,17 @@ import android.widget.TextView;
 
 public class foodLogAdapter extends CursorAdapter {
 
+    private Listener listener;
+
+    interface Listener {
+        void onClickCustom(int id);
+    }
+
+    public void setListener(Listener listener)
+    {
+        this.listener = listener;
+    }
+
     public foodLogAdapter(Context context, Cursor cursor) {
         super(context, cursor, 0);
     }
@@ -31,7 +42,7 @@ public class foodLogAdapter extends CursorAdapter {
         //TextView mass = (TextView) view.findViewById(R.id.mass);
         String foodString = cursor.getString(cursor.getColumnIndex("food"));
         String caloriesString = String.format("%.1f", cursor.getDouble(cursor.getColumnIndex("calories")));
-        String massUnit = cursor.getString(4);
+        String massUnit = cursor.getString(cursor.getColumnIndex("massUnit"));
         String massString = String.format("%.1f", cursor.getDouble(cursor.getColumnIndex("mass")));
         if(massUnit.contentEquals("")) massString = massString.substring(0,massString.indexOf('.'));
         int id = cursor.getInt(0);
@@ -40,9 +51,7 @@ public class foodLogAdapter extends CursorAdapter {
         view.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(view.getContext(), DeleteDailyEntry.class);
-                intent.putExtra("id", id);
-                view.getContext().startActivity(intent);
+                listener.onClickCustom(id);
             }});
     }
 }

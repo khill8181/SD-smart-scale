@@ -3,7 +3,6 @@ package com.example.Smartscale;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
-
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -27,7 +26,8 @@ import android.widget.TextView;
 import java.util.Calendar;
 import android.widget.Toast;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity
+                            implements nameNewMealDialogFragment.nameNewMealDialogListener{
     public static final String EXTRA_MESSAGE = "com.example.Smartscale.MESSAGE";
     private SQLiteDatabase db;
     private Cursor breakfastCursor;
@@ -69,7 +69,7 @@ public class MainActivity extends AppCompatActivity {
 
         //editor.putString("oldestDateAvailable", "1-10-2021");//for testing
         //SmartscaleDatabaseHelper.insertCalorieEntry(db, lastDayOpened, 2000, 0);
-        if (lastDayOpened == "never" || lastDayOpened != currentDateString)
+        if (lastDayOpened == "never" || !lastDayOpened.contentEquals(currentDateString))
         {
             if(lastDayOpened == "never") {
                 SmartscaleDatabaseHelper.insertCalorieEntry(db, currentDateString, 2000, 0); //insert todays date into the table, only for first time opening app
@@ -84,11 +84,11 @@ public class MainActivity extends AppCompatActivity {
                 do {
                 rollForward(parsedDate);
                 SmartscaleDatabaseHelper.insertCalorieEntry(db, createDateString(parsedDate, true), calGoal, 0);
-            }
-            while (parsedDate.get(Calendar.DAY_OF_YEAR) != currentDate.get(Calendar.DAY_OF_YEAR));
+                }
+                while (parsedDate.get(Calendar.DAY_OF_YEAR) != currentDate.get(Calendar.DAY_OF_YEAR));
         //starting at day after given date, add entries up to and including today
         //update the last day app was opened
-               }
+            }
             editor.putString("lastDayOpened",currentDateString);
             editor.commit();
         }
@@ -106,25 +106,14 @@ public class MainActivity extends AppCompatActivity {
 
         breakfastAdapter = new foodLogAdapter(this,breakfastCursor);
         //dinnerAdapter = new foodLogAdapter(this,dinnerCursor);
-
-        //Create the listener
-        AdapterView.OnItemClickListener itemClickListener =
-                new AdapterView.OnItemClickListener(){
-                    @Override
-                    public void onItemClick(AdapterView<?> list,
-                                            View itemView,
-                                            int position,
-                                            long id) {
-                        //Pass the drink the user clicks on to DrinkActivity
-                        Intent intent = new Intent(MainActivity.this, DeleteDailyEntry.class);
-                        intent.putExtra("id", (int) id);
-                        startActivity(intent);
-                    }
-                };
-
-        //Assign the listener to the list view
-        breakfastList.setOnItemClickListener(itemClickListener);
-        //dinnerList.setOnItemClickListener(itemClickListener);
+        breakfastAdapter.setListener(new foodLogAdapter.Listener() {
+            @Override
+            public void onClickCustom(int id) {
+                Intent intent = new Intent(MainActivity.this, DeleteDailyEntry.class);
+                intent.putExtra("id", id);
+                startActivity(intent);
+            }
+        });
 
         breakfastList.setAdapter(breakfastAdapter);
         //dinnerList.setAdapter(dinnerAdapter);
@@ -165,6 +154,56 @@ public class MainActivity extends AppCompatActivity {
                 .putBoolean("isFirstRun", false).commit();
         ////
 
+    }
+
+    public void addMeal(View view)
+    {
+        Intent intent = new Intent(this, selectMealToAdd.class);
+        startActivity(intent);
+    }
+
+    public void saveMeal(View view)
+    {
+        nameNewMealDialogFragment testing = new nameNewMealDialogFragment();
+        testing.show(getSupportFragmentManager(),"testing");
+    }
+
+    public void onSubmitMealName(String mealName)
+    {
+        if (breakfastCursor.moveToFirst())
+        {
+            SmartscaleDatabaseHelper.insertMealName(db,mealName);
+            do {
+                SmartscaleDatabaseHelper.insertSavedMealEntry(db,mealName,breakfastCursor.getString(1),breakfastCursor.getDouble(3)
+                ,breakfastCursor.getString(4),breakfastCursor.getDouble(2));
+                breakfastCursor.moveToNext();
+            }
+            while (!breakfastCursor.isAfterLast());
+
+            Context context = getApplicationContext();
+            CharSequence text = "Meal added!";
+            int duration = Toast.LENGTH_SHORT;
+
+            Toast toast = Toast.makeText(context, text, duration);
+            toast.show();
+
+
+
+        }
+
+        //test current date and past dates
+
+        //no entries to be saved
+        else {
+            Context context = getApplicationContext();
+            CharSequence text = "No entries to add";
+            int duration = Toast.LENGTH_SHORT;
+
+            Toast toast = Toast.makeText(context, text, duration);
+            toast.show();
+        }
+
+        //SmartscaleDatabaseHelper.insertSavedMealEntry(db,);
     }
 
     static public Calendar parseDateStringToCalendar(String dateString)
@@ -229,6 +268,7 @@ public class MainActivity extends AppCompatActivity {
             Cursor newBreakfastCursor = db.query("Foodlog", new String[]{"_id", "food", "calories","mass","massUnit"},
                     "date = ? and mealTime = ?", new String[]{createDateString(focusedDate, true),"breakfast"}
                     , null, null, null);
+            breakfastCursor = newBreakfastCursor;
             breakfastAdapter.changeCursor(newBreakfastCursor);
             /*Cursor newDinnerCursor = db.query("Foodlog", new String[]{"_id", "food", "calories","mass","massUnit"},
                     "date = ? and mealTime = ?", new String[]{createDateString(focusedDate, true),"dinner"}
@@ -265,6 +305,7 @@ public class MainActivity extends AppCompatActivity {
             Cursor newBreakfastCursor = db.query("Foodlog", new String[] {"_id","food","calories","mass","massUnit"}
             ,"date = ? and mealTime = ?",new String[] {createDateString(focusedDate,true), "breakfast"}
                     ,null,null,null);
+            breakfastCursor = newBreakfastCursor;
             breakfastAdapter.changeCursor(newBreakfastCursor);
             /*Cursor newDinnerCursor = db.query("Foodlog", new String[] {"_id","food","calories","mass","massUnit"}
                     ,"date = ? and mealTime = ?",new String[] {createDateString(focusedDate,true), "dinner"}
@@ -277,7 +318,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    public void changeGoal(View view)
+    public void changeGoal()
     {
         Intent intent = new Intent(this, calorieGoal.class);
         startActivity(intent);
@@ -314,7 +355,7 @@ public class MainActivity extends AppCompatActivity {
 
         // Perform action based on which item was selected
         if (id == R.id.setCalorieGoal) {
-            changeGoal(findViewById(android.R.id.content).getRootView());
+            changeGoal();
             return true;
         }
         else if (id == R.id.connectScale) {

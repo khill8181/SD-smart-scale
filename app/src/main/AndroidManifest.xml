@@ -14,15 +14,17 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/SmartScaleTheme">
-        
+        <activity android:name=".confirmAddMeal"></activity>
+        <activity android:name=".selectMealToAdd" />
+
         <service
             android:name=".BluetoothService"
             android:enabled="true"
-            android:exported="true"></service>
+            android:exported="true" />
 
         <activity android:name=".SelectDeviceActivity" />
         <activity android:name=".bluetoothConnection" />
-        <activity android:name=".completeDelayedMeas"></activity>
+        <activity android:name=".completeDelayedMeas" />
         <activity android:name=".chooseCountableItem" />
         <activity android:name=".chooseCalAmount" />
         <activity android:name=".choosingProportions" />

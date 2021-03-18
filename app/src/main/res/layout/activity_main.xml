@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".MainActivity"
-    tools:menu="@menu/main_page">
+    tools:menu="@menu/menu_main">
 
     <LinearLayout
 
@@ -54,6 +54,14 @@
 
             </LinearLayout>
 
+            <Button
+                android:id="@+id/button5"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:onClick="addMeal"
+                android:text="Add meal" />
+
         </LinearLayout>
 
         <LinearLayout
@@ -90,6 +98,14 @@
                 android:layout_weight="1"
                 android:onClick="insertDailyEntry"
                 android:text="Add daily entry" />
+
+            <Button
+                android:id="@+id/button2"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:onClick="saveMeal"
+                android:text="Save meal" />
         </LinearLayout>
 
         <LinearLayout

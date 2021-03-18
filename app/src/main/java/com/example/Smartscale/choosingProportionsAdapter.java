@@ -53,17 +53,6 @@ public class choosingProportionsAdapter extends CursorAdapter {
                     listener.onLoseFocus(foodString,proportion.getText().toString(),mass,calories,count);
             }
         });
-
-
-        /*// Find fields to populate in inflated template
-        TextView tvBody = (TextView) view.findViewById(R.id.tvBody);
-        TextView tvPriority = (TextView) view.findViewById(R.id.tvPriority);
-        // Extract properties from cursor
-        String body = cursor.getString(cursor.getColumnIndexOrThrow("body"));
-        int priority = cursor.getInt(cursor.getColumnIndexOrThrow("priority"));
-        // Populate fields with extracted properties
-        tvBody.setText(body);
-        tvPriority.setText(String.valueOf(priority));*/
     }
 
 }
