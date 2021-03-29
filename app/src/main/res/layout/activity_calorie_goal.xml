@@ -31,14 +31,137 @@
         app:layout_constraintStart_toEndOf="@+id/textView2"
         tools:layout_editor_absoluteY="39dp" />
 
+
+    <EditText
+        android:id="@+id/ageEditText"
+        android:layout_width="209dp"
+        android:layout_height="39dp"
+        android:layout_marginStart="32dp"
+        android:layout_marginLeft="32dp"
+        android:layout_marginTop="16dp"
+        android:hint="age in years"
+        android:text=""
+        android:inputType="number"
+        app:layout_constraintStart_toEndOf="@+id/textView2"
+        app:layout_constraintTop_toBottomOf="@+id/editText2" />
+
+    <EditText
+        android:id="@+id/weightEditText"
+        android:layout_width="209dp"
+        android:layout_height="39dp"
+        android:layout_marginStart="32dp"
+        android:layout_marginLeft="32dp"
+        android:layout_marginTop="16dp"
+        android:hint="weight in lbs"
+        android:text=""
+        android:inputType="number"
+        app:layout_constraintStart_toEndOf="@+id/textView2"
+        app:layout_constraintTop_toBottomOf="@+id/ageEditText" />
+
+    <EditText
+        android:id="@+id/heightEditText"
+        android:layout_width="209dp"
+        android:layout_height="39dp"
+        android:layout_marginStart="32dp"
+        android:layout_marginLeft="32dp"
+        android:layout_marginTop="16dp"
+        android:hint="height in inches"
+        android:text=""
+        android:inputType="number"
+        app:layout_constraintStart_toEndOf="@+id/textView2"
+        app:layout_constraintTop_toBottomOf="@+id/weightEditText" />
+
+    <RadioGroup
+        android:id="@+id/radioGroup"
+        android:layout_width="wrap_content"
+        android:layout_height="39dp"
+        android:layout_marginStart="32dp"
+        android:layout_marginLeft="32dp"
+        android:layout_marginTop="16dp"
+        android:orientation="horizontal"
+        app:layout_constraintStart_toEndOf="@+id/textView2"
+        app:layout_constraintTop_toBottomOf="@+id/heightEditText"
+        tools:layout_editor_absoluteX="181dp">
+
+        <RadioButton
+            android:id="@+id/radio_male"
+            android:layout_width="106dp"
+            android:layout_height="30dp"
+            android:onClick="onRadioButtonClicked"
+            android:text="Male"
+            app:layout_constraintTop_toBottomOf="@+id/heightEditText"
+            tools:layout_editor_absoluteX="181dp" />
+
+        <RadioButton
+            android:id="@+id/radio_female"
+            android:layout_width="101dp"
+            android:layout_height="30dp"
+            android:onClick="onRadioButtonClicked"
+            android:text="Female"
+            app:layout_constraintTop_toBottomOf="@+id/heightEditText"
+            tools:layout_editor_absoluteX="289dp" />
+    </RadioGroup>
+
+    <RadioGroup
+        android:id="@+id/radioGroup2"
+        android:layout_width="215dp"
+        android:layout_height="35dp"
+        android:layout_marginStart="32dp"
+        android:layout_marginLeft="32dp"
+        android:layout_marginTop="16dp"
+        android:orientation="horizontal"
+        app:layout_constraintStart_toEndOf="@+id/textView2"
+        app:layout_constraintTop_toBottomOf="@+id/radioGroup">
+
+        <RadioButton
+            android:id="@+id/radio_loseWeight"
+            android:layout_width="64dp"
+            android:layout_height="30dp"
+            android:onClick="onRadioButton2Clicked"
+            android:text="Lose"
+            app:layout_constraintTop_toBottomOf="@+id/heightEditText"
+            tools:layout_editor_absoluteX="181dp" />
+
+        <RadioButton
+            android:id="@+id/radio_gainWeight"
+            android:layout_width="60dp"
+            android:layout_height="30dp"
+            android:onClick="onRadioButton2Clicked"
+            android:text="Gain"
+            app:layout_constraintTop_toBottomOf="@+id/heightEditText"
+            tools:layout_editor_absoluteX="289dp" />
+
+        <RadioButton
+            android:id="@+id/radio_maintainWeight"
+            android:layout_width="88dp"
+            android:layout_height="30dp"
+            android:onClick="onRadioButton2Clicked"
+            android:text="Maintain"
+            app:layout_constraintTop_toBottomOf="@+id/heightEditText"
+            tools:layout_editor_absoluteX="289dp" />
+    </RadioGroup>
+
+    <Button
+        android:id="@+id/button_calculate"
+        android:layout_width="209dp"
+        android:layout_height="39dp"
+        android:layout_marginStart="32dp"
+        android:layout_marginLeft="32dp"
+        android:layout_marginTop="16dp"
+        android:onClick="calcCalories"
+        android:text="Calculate Calories"
+        app:layout_constraintStart_toEndOf="@+id/textView2"
+        app:layout_constraintTop_toBottomOf="@+id/radioGroup2" />
+
     <Button
         android:id="@+id/button3"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="94dp"
+        android:layout_marginTop="24dp"
         android:onClick="submitNewGoal"
-        android:text="Button"
-        app:layout_constraintTop_toBottomOf="@+id/editText2"
-        tools:layout_editor_absoluteX="151dp" />
+        android:text="Submit"
+        app:layout_constraintStart_toEndOf="@+id/textView2"
+        app:layout_constraintTop_toBottomOf="@+id/button_calculate" />
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>
