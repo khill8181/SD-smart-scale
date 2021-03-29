@@ -15,5 +15,9 @@
         android:orderInCategory="200"
         android:title="@string/connect_scale"
         app:showAsAction="never" />
+    <item
+        android:id="@+id/addFoodMenuItem"
+        android:orderInCategory="201"
+        android:title="Add Food" />
 
 </menu>

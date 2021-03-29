@@ -46,12 +46,14 @@ public class chooseFood extends AppCompatActivity {
     LinearLayout searchBarLayout;
     static boolean onMainPage = true;
     Intent oldIntent;
+    boolean isBeginDelayedMeasurement;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_choose_food2);
         oldIntent = getIntent();
+        isBeginDelayedMeasurement = oldIntent.getBooleanExtra("isBeginDelayedMeasurement",false);
         onMainPage = true;
         addPropComboBttn = findViewById(R.id.addPropComboButton);
         noResultsView = findViewById(R.id.noResultsView);
@@ -62,6 +64,9 @@ public class chooseFood extends AppCompatActivity {
         searchBarLayout = findViewById(R.id.searchBarLayout);
         submitFoodChoices.setVisibility(View.GONE);
         list = (ListView) findViewById(R.id.foodList);
+
+        if(isBeginDelayedMeasurement) {addByCountBttn.setVisibility(View.GONE);addPropComboBttn.setVisibility(View.GONE);}
+
         SQLiteOpenHelper smartscaleDBHelper = new SmartscaleDatabaseHelper(this);
         db = smartscaleDBHelper.getReadableDatabase();
         //messing around with stupid blinking cursor
@@ -90,7 +95,7 @@ public class chooseFood extends AppCompatActivity {
                         //Pass the drink the user clicks on to DrinkActivity
                         Intent intent = new Intent(chooseFood.this, addDailyEntry.class);
                         intent.putExtra("id", (int) id);
-                        intent.putExtra("isDelayedMeasurement",oldIntent.getBooleanExtra("isDelayedMeasurement",false));
+                        intent.putExtra("isBeginDelayedMeasurement",isBeginDelayedMeasurement);
                         startActivity(intent);
                     }
                 };
@@ -251,6 +256,7 @@ public class chooseFood extends AppCompatActivity {
                                                                             array[position].calories,0);
                                     Intent intent = new Intent(chooseFood.this, addDailyEntry.class);
                                     intent.putExtra("id", (int) dbID);
+                                    intent.putExtra("isBeginDelayedMeasurement",isBeginDelayedMeasurement);
                                     startActivity(intent);
                                 }
                             };

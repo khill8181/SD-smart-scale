@@ -14,7 +14,8 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/SmartScaleTheme">
-        <activity android:name=".confirmAddMeal"></activity>
+        <activity android:name=".addFoodToTable"></activity>
+        <activity android:name=".confirmAddMeal" />
         <activity android:name=".selectMealToAdd" />
 
         <service

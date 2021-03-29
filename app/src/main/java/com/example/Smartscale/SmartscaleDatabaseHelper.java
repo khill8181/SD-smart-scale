@@ -31,7 +31,7 @@ public class SmartscaleDatabaseHelper extends SQLiteOpenHelper {
         db.execSQL("CREATE TABLE Foodlist ("
                 +"_id integer primary key autoincrement, "
                 +"food text, "
-                +"mass integer, "
+                +"mass real, "
                 +"calories integer, "
                 +"count integer);");
 
@@ -40,10 +40,6 @@ public class SmartscaleDatabaseHelper extends SQLiteOpenHelper {
         db.execSQL("create table savedMeals (_id integer primary key autoincrement, mealName text, food text, mass real, massUnit text, calories real)");
         db.execSQL("create table mealNames (_id integer primary key autoincrement, name text)");
 
-        insertNewFood(db, "popcorn", 2,10,3);
-        insertNewFood(db, "corn", 3,20,0);
-        insertNewFood(db, "pop", 4,15,0);
-        insertNewFood(db, "opcor", 6,25,1);
     }
 
     @Override
@@ -100,7 +96,7 @@ public class SmartscaleDatabaseHelper extends SQLiteOpenHelper {
     //food table
     public static long insertNewFood(SQLiteDatabase db,
                                    String food,
-                                   int mass,
+                                   double mass,
                                    int calories,
                                    int count) {
         ContentValues entryValues = new ContentValues();

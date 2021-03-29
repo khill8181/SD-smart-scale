@@ -2,7 +2,9 @@ package com.example.Smartscale;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
@@ -13,6 +15,7 @@ import android.widget.Button;
 import android.widget.CheckedTextView;
 import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 
@@ -80,9 +83,20 @@ public class choosingProportions extends AppCompatActivity {
     {
         if (view.getId() == R.id.restOfCal)
         {
-            Intent intent = new Intent(this, addDailyEntry.class);
-            intent.putExtra("isProportionEntry",true);
-            intentChooserHelperForsubmitProportions(intent);
+            SharedPreferences sharedpreferences = getSharedPreferences("MyPREFERENCES", Context.MODE_PRIVATE);
+            float caloriesLeft = sharedpreferences.getFloat("caloriesLeft",0);
+            if(caloriesLeft <= 0)
+            {
+                Context context = getApplicationContext();
+                CharSequence text = "You don't have any calories left";
+                int duration = Toast.LENGTH_SHORT;
+                Toast toast = Toast.makeText(context, text, duration);
+                toast.show();
+            }
+            else
+            {   Intent intent = new Intent(this, addDailyEntry.class);
+                intent.putExtra("isProportionEntry",true);
+                intentChooserHelperForsubmitProportions(intent);}
         }
         if (view.getId() == R.id.chooseCalAmount){
             Intent intent = new Intent(this, chooseCalAmount.class);
