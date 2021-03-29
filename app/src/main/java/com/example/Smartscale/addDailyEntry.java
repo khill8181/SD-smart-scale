@@ -94,6 +94,7 @@ public class addDailyEntry extends AppCompatActivity {
         calories = (EditText) findViewById(R.id.calcCalories);
         units = findViewById(R.id.units);
         tareButton = findViewById(R.id.tareButton);
+        final Button buttonConnect = findViewById(R.id.buttonConnect);
         unitsString = units.getText().toString();//defaults to "g"
         intent = getIntent();
         unitToggle = findViewById(R.id.unitToggle);
@@ -117,6 +118,7 @@ public class addDailyEntry extends AppCompatActivity {
 
             unitsString = ""; units.setVisibility(View.GONE); unitToggle.setVisibility(View.GONE);
             tareButton.setVisibility(View.GONE);
+            buttonConnect.setVisibility(View.GONE);
         }
         massSeenByUser.addTextChangedListener(new TextWatcher() {
 
@@ -177,12 +179,11 @@ public class addDailyEntry extends AppCompatActivity {
         }
         // josh addition////////////////////////////////////////////////////////////
         //For Bluetooth Connectivity
-        final Button buttonConnect = findViewById(R.id.buttonConnect);
         // If a bluetooth device has been selected from SelectDeviceActivity
         SharedPreferences btDetail = getSharedPreferences("btDetail", MODE_PRIVATE);
         //deviceName = getIntent().getStringExtra("deviceName");
         deviceName = btDetail.getString("btName", null);
-        if (deviceName != null){
+        if (deviceName != null && !isCountEntry){
             // Get the device address to make BT Connection
             deviceAddress = btDetail.getString("btAddress", null);
             // Show progress and connection status
@@ -195,7 +196,7 @@ public class addDailyEntry extends AppCompatActivity {
             selected device (see the thread code below)
              */
             BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
-            createConnectThread = new CreateConnectThread(bluetoothAdapter,deviceAddress);
+            createConnectThread = new CreateConnectThread(bluetoothAdapter,deviceAddress, this);
             createConnectThread.start();
         }
 
@@ -221,7 +222,13 @@ public class addDailyEntry extends AppCompatActivity {
                         buttonConnect.setEnabled(true);
                         if (msg.obj != null) {
                             btMass = msg.obj.toString();
-                            EditText editText = (EditText) findViewById(R.id.massSeenByUser);
+                            EditText editText;
+
+                            if (isCompleteDelayedMeasurement)
+                                editText = (EditText) findViewById(R.id.massFromScale);
+                            else
+                                editText = (EditText) findViewById(R.id.massSeenByUser);
+
                             editText.setText(btMass);
                         }
 
@@ -233,7 +240,7 @@ public class addDailyEntry extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 // Move to adapter list
-                if (deviceName == null){
+                if (deviceName == null && !isCountEntry){
                     Intent intent = new Intent(addDailyEntry.this, SelectDeviceActivity.class);
                     startActivity(intent);
                 }
@@ -360,11 +367,26 @@ public class addDailyEntry extends AppCompatActivity {
         tareButton.setVisibility(View.VISIBLE);
         proportionedEntry();
 
+        final Button buttonConnect = findViewById(R.id.buttonConnect);
+        // If a bluetooth device has been selected from SelectDeviceActivity
+        SharedPreferences btDetail = getSharedPreferences("btDetail", MODE_PRIVATE);
+        //deviceName = getIntent().getStringExtra("deviceName");
+        deviceName = btDetail.getString("btName", null);
+        if (deviceName != null && !isCountEntry){
+            deviceAddress = btDetail.getString("btAddress", null);
+            buttonConnect.setText("Connecting to " + deviceName + "...");
+            buttonConnect.setEnabled(false);
+            BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+            createConnectThread = new CreateConnectThread(bluetoothAdapter,deviceAddress, this);
+            createConnectThread.start();
+        }
     }
     /* ============================ Thread to Create Bluetooth Connection =================================== */
     public static class CreateConnectThread extends Thread {
 
-        public CreateConnectThread(BluetoothAdapter bluetoothAdapter, String address) {
+        addDailyEntry parent;
+
+        public CreateConnectThread(BluetoothAdapter bluetoothAdapter, String address, addDailyEntry parent) {
             /*
             Use a temporary object that is later assigned to mmSocket
             because mmSocket is final.
@@ -372,6 +394,7 @@ public class addDailyEntry extends AppCompatActivity {
             BluetoothDevice bluetoothDevice = bluetoothAdapter.getRemoteDevice(address);
             BluetoothSocket tmp = null;
             UUID uuid = bluetoothDevice.getUuids()[0].getUuid();
+            this.parent = parent;
 
             try {
                 /*
@@ -413,7 +436,7 @@ public class addDailyEntry extends AppCompatActivity {
             // The connection attempt succeeded. Perform work associated with
             // the connection in a separate thread.
             connectedThread = new ConnectedThread(mmSocket);
-            connectedThread.run();
+            connectedThread.run(parent);
         }
 
         // Closes the client socket and causes the thread to finish.
@@ -448,10 +471,14 @@ public class addDailyEntry extends AppCompatActivity {
             mmOutStream = tmpOut;
         }
 
-        public void run() {
+        public void run(addDailyEntry parent) {
             byte[] buffer = new byte[1024];  // buffer store for the stream
             int bytes = 0; // bytes returned from read()
             // Keep listening to the InputStream until an exception occurs
+            if (parent.unitsString.equals("g"))
+                connectedThread.write("g");
+            else
+                connectedThread.write("o");
             while (true) {
                 try {
                     /*
@@ -465,6 +492,7 @@ public class addDailyEntry extends AppCompatActivity {
                         Log.e("Arduino Message",readMessage);
                         handler.obtainMessage(MESSAGE_READ,readMessage).sendToTarget();
                         bytes = 0;
+                        connectedThread.write("r");
                     } else {
                         bytes++;
                     }
@@ -488,6 +516,7 @@ public class addDailyEntry extends AppCompatActivity {
         /* Call this from the main activity to shutdown the connection */
         public void cancel() {
             try {
+                connectedThread.write("d");
                 mmSocket.close();
             } catch (IOException e) { }
         }
