@@ -2,6 +2,7 @@ package com.example.Smartscale;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -43,13 +44,23 @@ public class confirmAddMeal extends AppCompatActivity {
     {
         SharedPreferences sharedPreferences = getSharedPreferences("MyPREFERENCES", Context.MODE_PRIVATE);
         String focusedDate = sharedPreferences.getString("focusedDate","string");
+        Cursor calConsumedCursor = db.query("calories", new String[] {"calConsumed"},"date = ?",
+                new String [] {focusedDate},null,null,null);
+        calConsumedCursor.moveToFirst();
+        double calConsumed = calConsumedCursor.getDouble(0);
         cursor.moveToFirst();
+        double entryCalories;
         do {
+            entryCalories = cursor.getDouble(2);
+            calConsumed += entryCalories;
             SmartscaleDatabaseHelper.insertEntry(db,cursor.getString(1),focusedDate,cursor.getDouble(3),
-                    cursor.getString(4),cursor.getDouble(2),"breakfast");
+                    cursor.getString(4),entryCalories,"breakfast");
             cursor.moveToNext();
         }
         while (!cursor.isAfterLast());
+        ContentValues contentValues = new ContentValues();
+        contentValues.put("calConsumed", calConsumed);
+        db.update("calories", contentValues, "date=?", new String[]{focusedDate});
         startActivity(new Intent(this, MainActivity.class));
     }
 
