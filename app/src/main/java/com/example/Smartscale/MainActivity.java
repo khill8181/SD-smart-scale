@@ -44,6 +44,7 @@ public class MainActivity extends AppCompatActivity
     static boolean startUp = true;
     SharedPreferences.Editor editor;
     private String deviceName = null;
+    float caloriesLeft;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -224,8 +225,9 @@ public class MainActivity extends AppCompatActivity
         calConsumedCursor.moveToFirst();
         int calGoal = calConsumedCursor.getInt(0);
         double calConsumed = calConsumedCursor.getDouble(1);
+        caloriesLeft = (float) (calGoal-calConsumed);
         calGoalView.setText(Integer.toString(calGoal));
-        calLeftView.setText(String.format("%.1f", calGoal-calConsumed));
+        calLeftView.setText(String.format("%.1f", caloriesLeft));
     }
     @Override
     public void onDestroy(){
@@ -334,8 +336,9 @@ public class MainActivity extends AppCompatActivity
     {
 
         Intent intent = new Intent(MainActivity.this, chooseFood.class);
-        if (view.getId() == R.id.addDailyEntry) editor.putString("mealTime", "breakfast");
-        else editor.putString("mealTime", "dinner");
+        editor.putFloat("caloriesLeft",caloriesLeft);
+        editor.putString("mealTime", "breakfast");
+        if (view.getId() == R.id.begDelMeas) intent.putExtra("isBeginDelayedMeasurement",true);
         editor.commit();
         startActivity(intent);
     }
@@ -361,6 +364,10 @@ public class MainActivity extends AppCompatActivity
         else if (id == R.id.connectScale) {
             Intent intent = new Intent(MainActivity.this, SelectDeviceActivity.class);
             startActivity(intent);
+            return true;
+        }
+        else if (id == R.id.addFoodMenuItem) {
+            startActivity(new Intent(MainActivity.this , addFoodToTable.class));
             return true;
         }
 

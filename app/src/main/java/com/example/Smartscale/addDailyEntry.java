@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
+import android.graphics.Color;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
@@ -39,6 +40,12 @@ import java.util.Calendar;
 
 
 public class addDailyEntry extends AppCompatActivity {
+   //different input cases
+    boolean isProportionEntry;
+    boolean isCountEntry;
+    boolean isCompleteDelayedMeasurement;
+    boolean isBeginDelayedMeasurement;
+    //general variables
     double calMassRatioG;
     double calCountRatio;
     SQLiteOpenHelper smartscaleDBHelper = new SmartscaleDatabaseHelper(this);
@@ -48,7 +55,6 @@ public class addDailyEntry extends AppCompatActivity {
     SharedPreferences sharedPreferences;
     double currentCalLeft;
     TextView calLeft;
-    boolean isProportionEntry;
     protected ArrayList<String> proportionData;
     double sumOfRatios;
     TextView propEntryValue;
@@ -57,23 +63,19 @@ public class addDailyEntry extends AppCompatActivity {
     double calConsumedToday;
     double entryCalories;
     int calGoal;
-    boolean isCountEntry;
     double firstEntryRatio;
     Intent intent;
     EditText calories;
     int foodID;
     double entryMass;
-    EditText massFromScale;
-    EditText massSeenByUser;
-    boolean isCompleteDelayedMeasurement;
+    TextView massFromScale;
+    EditText ETfoodQuantity;
     String focusedDate;
     TextView units;
     String unitsString;
     Button unitToggle;
     boolean emptyEntryMass = false;
     Button tareButton;
-
-
 
     //bluetooth variables
     private String deviceName = null;
@@ -85,13 +87,13 @@ public class addDailyEntry extends AppCompatActivity {
     private final static int CONNECTING_STATUS = 1; // used in bluetooth handler to identify message status
     private final static int MESSAGE_READ = 2; // used in bluetooth handler to identify message update
     String btMass;
-    //
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_daily_entry);
         LinearLayout proportionView = findViewById(R.id.proportionView);
-        calories = (EditText) findViewById(R.id.calcCalories);
+        calories = findViewById(R.id.calcCalories);
         units = findViewById(R.id.units);
         tareButton = findViewById(R.id.tareButton);
         unitsString = units.getText().toString();//defaults to "g"
@@ -100,8 +102,15 @@ public class addDailyEntry extends AppCompatActivity {
         sharedPreferences = getSharedPreferences("MyPREFERENCES", Context.MODE_PRIVATE);
         focusedDate = sharedPreferences.getString("focusedDate","string");
         LinearLayout massFromScaleLayout = findViewById(R.id.massFromScaleLayout);
+        LinearLayout calorieLayout = findViewById(R.id.calorieLayout);
+
+
         isCompleteDelayedMeasurement = intent.getBooleanExtra("isCompleteDelayedMeasurement",false);
+        isBeginDelayedMeasurement = intent.getBooleanExtra("isBeginDelayedMeasurement",false);
+
         if(!isCompleteDelayedMeasurement) massFromScaleLayout.setVisibility(View.GONE);
+        if(isBeginDelayedMeasurement) calorieLayout.setVisibility(View.GONE);
+
         isProportionEntry = intent.getBooleanExtra("isProportionEntry", false);
         isCountEntry = intent.getBooleanExtra("isCountEntry",false);
         TextView propEntryText = (TextView) findViewById(R.id.propEntryText);
@@ -109,16 +118,22 @@ public class addDailyEntry extends AppCompatActivity {
         dbText = (TextView) findViewById(R.id.foodName);
         calLeft = (TextView) findViewById(R.id.calLeftAddingEntry);
         massFromScale = findViewById(R.id.massFromScale);
-        massSeenByUser = (EditText) findViewById(R.id.massSeenByUser);
+        ETfoodQuantity = findViewById(R.id.ETfoodQuantity);
+        disableEditText(calories);
         db = smartscaleDBHelper.getReadableDatabase();
         setCaloriesLeft();
+
+        //LinearLayout foodMassLayout = findViewById(R.id.foodMassLayout);
         if(isCountEntry)
         {
-
-            unitsString = ""; units.setVisibility(View.GONE); unitToggle.setVisibility(View.GONE);
+            unitsString = "";
+            units.setText(unitsString);
+            unitToggle.setVisibility(View.GONE);
             tareButton.setVisibility(View.GONE);
         }
-        massSeenByUser.addTextChangedListener(new TextWatcher() {
+        else    disableEditText(ETfoodQuantity);
+
+        ETfoodQuantity.addTextChangedListener(new TextWatcher() {
 
             @Override
             public void afterTextChanged(Editable s) {}
@@ -135,6 +150,27 @@ public class addDailyEntry extends AppCompatActivity {
                 calcCalories();
             }
         });
+
+        massFromScale.addTextChangedListener(new TextWatcher() {
+            double delayedMeasurementInitialValue = intent.getDoubleExtra("initialMeasurement",0);
+            double calculatedMassMeasurement = 0;
+            @Override
+            public void afterTextChanged(Editable s) {}
+
+            @Override
+            public void beforeTextChanged(CharSequence s, int start,
+                                          int count, int after) {
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start,
+                                      int before, int count) {
+                calculatedMassMeasurement = delayedMeasurementInitialValue - Double.parseDouble(massFromScale.getText().toString());
+                ETfoodQuantity.setText(String.format("%.1f", calculatedMassMeasurement));
+                    }
+                }
+            );
+
         if(!isProportionEntry) {
             proportionView.setVisibility(View.GONE);
             foodID = intent.getIntExtra("id", 0);
@@ -175,6 +211,8 @@ public class addDailyEntry extends AppCompatActivity {
             proportionData = new ArrayList<String>();
             proportionData.add("token string for logic purposes in insertDailyEntry");
         }
+
+        /*
         // josh addition////////////////////////////////////////////////////////////
         //For Bluetooth Connectivity
         final Button buttonConnect = findViewById(R.id.buttonConnect);
@@ -188,12 +226,13 @@ public class addDailyEntry extends AppCompatActivity {
             // Show progress and connection status
             buttonConnect.setText("Connecting to " + deviceName + "...");
             buttonConnect.setEnabled(false);
-
+        */
             /*
             This is the most important piece of code. When "deviceName" is found
             the code will call a new thread to create a bluetooth connection to the
             selected device (see the thread code below)
              */
+          /*
             BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
             createConnectThread = new CreateConnectThread(bluetoothAdapter,deviceAddress);
             createConnectThread.start();
@@ -221,8 +260,7 @@ public class addDailyEntry extends AppCompatActivity {
                         buttonConnect.setEnabled(true);
                         if (msg.obj != null) {
                             btMass = msg.obj.toString();
-                            EditText editText = (EditText) findViewById(R.id.massSeenByUser);
-                            editText.setText(btMass);
+                            ETfoodQuantity.setText(btMass);
                         }
 
                         break;
@@ -256,27 +294,30 @@ public class addDailyEntry extends AppCompatActivity {
                     connectedThread.write("u");
                 if(unitsString.contentEquals("g")) {units.setText("oz"); unitsString = "oz";}
                 else {units.setText("g"); unitsString = "g";}
+
+                if(ETfoodQuantity.getText().toString().contentEquals("")) emptyEntryMass = true;
                 calcCalories();
             }
         });
 
         /////////////////////////////////////////////////////////////////////////////
+   */
     }
 
-    public void toggleUnits(View view)
+    public void simulateScaleValues(View view)
     {
-        if(unitsString.contentEquals("g")) {units.setText("oz"); unitsString = "oz";}
-        else {units.setText("g"); unitsString = "g";}
-        calcCalories();
+        EditText ETsimulateScaleInput = findViewById(R.id.ETsimulateScaleInput);
+        if(isCompleteDelayedMeasurement) massFromScale.setText(ETsimulateScaleInput.getText());
+        else ETfoodQuantity.setText(ETsimulateScaleInput.getText());
     }
-    public void updateMassSeenByUser(View view)
-    {
-        if(isCompleteDelayedMeasurement)
-        {
-            double initialMeasurement = intent.getDoubleExtra("initialMeasurement",0);
-            double calculatedMassMeasurement = initialMeasurement - Double.parseDouble(massFromScale.getText().toString());
-            massSeenByUser.setText(String.format("%.1f", calculatedMassMeasurement));
-        }
+
+    private void disableEditText(EditText editText) {
+        editText.setFocusable(false);
+        editText.setEnabled(false);
+        editText.setCursorVisible(false);
+        editText.setKeyListener(null);
+        editText.setBackgroundColor(Color.TRANSPARENT);
+        editText.setTextColor(Color.BLACK);
     }
 
     public void setCaloriesLeft() {
@@ -291,7 +332,7 @@ public class addDailyEntry extends AppCompatActivity {
 
     public void proportionedEntry()
     {
-        massSeenByUser.setText("");
+        //ETfoodQuantity.setText("0");
         food = proportionData.get(0);
         double mass = Double.parseDouble(proportionData.get(2));
         double calories = Double.parseDouble(proportionData.get(3));
@@ -305,7 +346,7 @@ public class addDailyEntry extends AppCompatActivity {
     public void calcCalories()
     {
         if (emptyEntryMass) entryMass = 0;
-        else entryMass = Double.parseDouble(massSeenByUser.getText().toString());
+        else entryMass = Double.parseDouble(ETfoodQuantity.getText().toString());
 
         if(isCountEntry) entryCalories = calCountRatio*entryMass;
         else if (unitsString.contentEquals("g")) entryCalories = calMassRatioG*entryMass;
@@ -320,7 +361,7 @@ public class addDailyEntry extends AppCompatActivity {
     {
         String mealTime = sharedPreferences.getString("mealTime","string");
         if(isCompleteDelayedMeasurement) mealTime = intent.getStringExtra("mealTime");
-        if(intent.getBooleanExtra("isDelayedMeasurement",false))
+        if(isBeginDelayedMeasurement)
         {
             SmartscaleDatabaseHelper.insertDelayedMeasurement(db,foodID,entryMass,unitsString,mealTime);
             Intent newIntent = new Intent(this, MainActivity.class);
@@ -356,6 +397,8 @@ public class addDailyEntry extends AppCompatActivity {
             sumOfRatios += Double.parseDouble(proportionData.get(i));
         totalCaloriesBeingProportioned = entryCalories*(sumOfRatios/firstEntryRatio);
         unitsString = "g";
+        units.setText(unitsString);
+        disableEditText(ETfoodQuantity);
         unitToggle.setVisibility(View.VISIBLE);units.setVisibility(View.VISIBLE);
         tareButton.setVisibility(View.VISIBLE);
         proportionedEntry();
@@ -494,8 +537,8 @@ public class addDailyEntry extends AppCompatActivity {
     }
 
     /* ============================ Terminate Connection at BackPress ====================== */
-    @Override
-    public void onBackPressed() {
+    //@Override
+   /* public void onBackPressed() {
         // Terminate Bluetooth Connection and close app
         if (createConnectThread != null) {
             createConnectThread.cancel();
@@ -504,5 +547,5 @@ public class addDailyEntry extends AppCompatActivity {
         a.addCategory(Intent.CATEGORY_HOME);
         a.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         startActivity(a);
-    }
+    }*/
 }

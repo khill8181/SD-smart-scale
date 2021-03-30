@@ -47,7 +47,7 @@ public class foodLogAdapter extends CursorAdapter {
         if(massUnit.contentEquals("")) massString = massString.substring(0,massString.indexOf('.'));
         int id = cursor.getInt(0);
         massString+=massUnit;
-        food.setText(foodString); amounts.setText(caloriesString); //mass.setText(massString);
+        food.setText(foodString); amounts.setText(caloriesString + "cal | "+massString ); //mass.setText(massString);
         view.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
