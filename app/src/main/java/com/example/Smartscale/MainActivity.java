@@ -157,18 +157,6 @@ public class MainActivity extends AppCompatActivity
 
     }
 
-    public void addMeal(View view)
-    {
-        Intent intent = new Intent(this, selectMealToAdd.class);
-        startActivity(intent);
-    }
-
-    public void saveMeal(View view)
-    {
-        nameNewMealDialogFragment testing = new nameNewMealDialogFragment();
-        testing.show(getSupportFragmentManager(),"testing");
-    }
-
     public void onSubmitMealName(String mealName)
     {
         if (breakfastCursor.moveToFirst())
@@ -326,19 +314,12 @@ public class MainActivity extends AppCompatActivity
         startActivity(intent);
     }
 
-    public void completeDelayedMeasurement(View view)
-    {
-        Intent intent = new Intent(MainActivity.this, completeDelayedMeas.class);
-        startActivity(intent);
-    }
-
     public void insertDailyEntry(View view)
     {
 
         Intent intent = new Intent(MainActivity.this, chooseFood.class);
         editor.putFloat("caloriesLeft",caloriesLeft);
         editor.putString("mealTime", "breakfast");
-        if (view.getId() == R.id.begDelMeas) intent.putExtra("isBeginDelayedMeasurement",true);
         editor.commit();
         startActivity(intent);
     }
@@ -369,6 +350,21 @@ public class MainActivity extends AppCompatActivity
         else if (id == R.id.addFoodMenuItem) {
             startActivity(new Intent(MainActivity.this , addFoodToTable.class));
             return true;
+        }
+        else if(id == R.id.saveMealMenuItem) {
+            nameNewMealDialogFragment testing = new nameNewMealDialogFragment();
+            testing.show(getSupportFragmentManager(),"testing");
+        }
+        else if(id == R.id.beginDelayedMI){
+            Intent intent = new Intent(MainActivity.this, chooseFood.class);
+            editor.putFloat("caloriesLeft",caloriesLeft);
+            editor.putString("mealTime", "breakfast");
+            intent.putExtra("isBeginDelayedMeasurement",true);
+            editor.commit();
+            startActivity(intent);
+        }
+        else if(id == R.id.completeDelayedMI){
+            startActivity(new Intent(MainActivity.this, completeDelayedMeas.class));
         }
 
         return super.onOptionsItemSelected(item);

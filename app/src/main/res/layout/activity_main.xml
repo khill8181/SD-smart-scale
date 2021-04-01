@@ -16,53 +16,6 @@
         <include
             android:id="@+id/toolbar"
             layout="@layout/toolbar" />
-        <!--
-        <android.widget.Toolbar
-            android:id="@+id/mainToolbar"
-            android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize"
-            android:background="?attr/colorPrimary"/>
-         -->
-        <!--android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar" -->
-
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal">
-
-            <LinearLayout
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:gravity="center"
-                android:orientation="horizontal">
-
-                <TextView
-                    android:id="@+id/calorieGoalLabel"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:gravity="center"
-                    android:text="Calorie Goal: "/>
-
-                <TextView
-                    android:id="@+id/calorieGoal"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:gravity="center"
-                    android:text="calories "/>
-
-            </LinearLayout>
-
-            <Button
-                android:id="@+id/button5"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:onClick="addMeal"
-                android:text="Add meal" />
-
-        </LinearLayout>
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -77,11 +30,34 @@
                 android:orientation="vertical">
 
                 <TextView
+                    android:id="@+id/calorieGoalLabel"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:text="Calorie Goal "/>
+
+                <TextView
+                    android:id="@+id/calorieGoal"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:text="calories "/>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:orientation="vertical">
+
+                <TextView
                     android:id="@+id/textView4"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:gravity="center"
-                    android:text="Calories left today" />
+                    android:text="Calories left" />
 
                 <TextView
                     android:id="@+id/caloriesLeft"
@@ -89,6 +65,7 @@
                     android:layout_height="wrap_content"
                     android:gravity="center"
                     android:text="TextView" />
+
             </LinearLayout>
 
             <Button
@@ -97,37 +74,16 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:onClick="insertDailyEntry"
-                android:text="Add daily entry" />
+                android:text="Add entry" />
 
-            <Button
-                android:id="@+id/button2"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:onClick="saveMeal"
-                android:text="Save meal" />
         </LinearLayout>
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="42dp"
+            android:layout_height="wrap_content"
             android:orientation="horizontal">
 
-            <Button
-                android:id="@+id/begDelMeas"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:onClick="insertDailyEntry"
-                android:text="Begin delayed meas" />
 
-            <Button
-                android:id="@+id/completeDelayedMeas"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:onClick="completeDelayedMeasurement"
-                android:text="Complete delayed meas" />
         </LinearLayout>
 
         <LinearLayout
