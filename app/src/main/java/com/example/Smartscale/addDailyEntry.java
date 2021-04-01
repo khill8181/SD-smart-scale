@@ -216,6 +216,8 @@ public class addDailyEntry extends AppCompatActivity {
         }
 
 
+
+
         // josh addition////////////////////////////////////////////////////////////
         //For Bluetooth Connectivity
         // If a bluetooth device has been selected from SelectDeviceActivity
@@ -226,14 +228,18 @@ public class addDailyEntry extends AppCompatActivity {
             // Get the device address to make BT Connection
             deviceAddress = btDetail.getString("btAddress", null);
             // Show progress and connection status
+
             //buttonConnect.setText("Connecting to " + deviceName + "...");
             //buttonConnect.setEnabled(false);
+
 
             /*
             This is the most important piece of code. When "deviceName" is found
             the code will call a new thread to create a bluetooth connection to the
             selected device (see the thread code below)
              */
+
+
 
             BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
             createConnectThread = new CreateConnectThread(bluetoothAdapter,deviceAddress, this);
@@ -310,6 +316,7 @@ public class addDailyEntry extends AppCompatActivity {
         });
 
         /////////////////////////////////////////////////////////////////////////////
+
     }
 
 
