@@ -32,7 +32,7 @@ import retrofit2.Retrofit;
 public class chooseFood extends AppCompatActivity {
     private SQLiteDatabase db;
     private Cursor cursor;
-    SimpleCursorAdapter adapter;
+    foodLogAdapter adapter;
     ListView list;
     Button submitFoodChoices;
     ArrayList<Integer> ids;
@@ -78,29 +78,17 @@ public class chooseFood extends AppCompatActivity {
         cursor = db.query("Foodlist", new String[] {"_id","food",
                 "mass", "calories", "count"},null,null,null,null,null);
 
-        adapter = new SimpleCursorAdapter(this, R.layout.food_log_item ,cursor,
-                new String[] {"food","calories"},
-                new int[] {R.id.food, R.id.amounts}, 0);
-
+        adapter = new foodLogAdapter(this, cursor);
+        adapter.setListener(new foodLogAdapter.Listener() {
+            @Override
+            public void onClickCustom(int id) {
+                Intent intent = new Intent(chooseFood.this, addDailyEntry.class);
+                intent.putExtra("id", (int) id);
+                intent.putExtra("isBeginDelayedMeasurement",isBeginDelayedMeasurement);
+                startActivity(intent);
+            }
+        });
         list.setAdapter(adapter);
-
-        //Create the listener
-        AdapterView.OnItemClickListener itemClickListener =
-                new AdapterView.OnItemClickListener(){
-                    @Override
-                    public void onItemClick(AdapterView<?> list,
-                                            View itemView,
-                                            int position,
-                                            long id) {
-                        //Pass the drink the user clicks on to DrinkActivity
-                        Intent intent = new Intent(chooseFood.this, addDailyEntry.class);
-                        intent.putExtra("id", (int) id);
-                        intent.putExtra("isBeginDelayedMeasurement",isBeginDelayedMeasurement);
-                        startActivity(intent);
-                    }
-                };
-        //Assign the listener to the list view
-        list.setOnItemClickListener(itemClickListener);
     }
 
     public void proportionedFoodSelection(View view)
@@ -112,7 +100,7 @@ public class chooseFood extends AppCompatActivity {
         list.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
         submitFoodChoices.setVisibility(view.VISIBLE);
         ids = new ArrayList<Integer>();
-        adapter = new SimpleCursorAdapter(this, android.R.layout.simple_list_item_multiple_choice ,cursor,
+        SimpleCursorAdapter adapter = new SimpleCursorAdapter(this, android.R.layout.simple_list_item_multiple_choice ,cursor,
                 new String[] {"food"},
                 new int[] {android.R.id.text1}, 0);
         list.setAdapter(adapter);
@@ -172,31 +160,25 @@ public class chooseFood extends AppCompatActivity {
         Cursor newCursor = db.query("Foodlist", new String[] {"_id","food",
                 "mass", "calories", "count"},"count != ? ",new String[]{"0"},null,null,null);
         adapter.changeCursor(newCursor);
-        AdapterView.OnItemClickListener itemClickListener =
-                new AdapterView.OnItemClickListener(){
-                    @Override
-                    public void onItemClick(AdapterView<?> list,
-                                            View itemView,
-                                            int position,
-                                            long id) {
-                        //Pass the drink the user clicks on to DrinkActivity
-                        Intent intent = new Intent(chooseFood.this, addDailyEntry.class);
-                        intent.putExtra("id", (int) id);
-                        intent.putExtra("isCountEntry", true);
-                        startActivity(intent);
-                    }
-                };
-        //Assign the listener to the list view
-        list.setOnItemClickListener(itemClickListener);
+        adapter.setListener(new foodLogAdapter.Listener() {
+            @Override
+            public void onClickCustom(int id) {
+                Intent intent = new Intent(chooseFood.this, addDailyEntry.class);
+                intent.putExtra("id", (int) id);
+                intent.putExtra("isCountEntry", true);
+                startActivity(intent);
+            }
+        });
     }
 
     public void displaySearchResults(View view)
     {
+        searchedTerm = searchedTermView.getText().toString();
+        if(searchedTerm.contentEquals("")) return;
         onMainPage = false;
         addPropComboBttn.setVisibility(View.GONE);
         addByCountBttn.setVisibility(View.GONE);
         searchResults = new ArrayList<webAPIFood>();
-        searchedTerm = searchedTermView.getText().toString();
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl("https://trackapi.nutritionix.com/")
                 .build();

@@ -212,7 +212,7 @@ public class addDailyEntry extends AppCompatActivity {
             proportionData.add("token string for logic purposes in insertDailyEntry");
         }
 
-        /*
+/*
         // josh addition////////////////////////////////////////////////////////////
         //For Bluetooth Connectivity
         final Button buttonConnect = findViewById(R.id.buttonConnect);
@@ -226,13 +226,13 @@ public class addDailyEntry extends AppCompatActivity {
             // Show progress and connection status
             buttonConnect.setText("Connecting to " + deviceName + "...");
             buttonConnect.setEnabled(false);
-        */
+*/
             /*
             This is the most important piece of code. When "deviceName" is found
             the code will call a new thread to create a bluetooth connection to the
             selected device (see the thread code below)
              */
-          /*
+/*
             BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
             createConnectThread = new CreateConnectThread(bluetoothAdapter,deviceAddress);
             createConnectThread.start();
@@ -299,9 +299,9 @@ public class addDailyEntry extends AppCompatActivity {
                 calcCalories();
             }
         });
-
+*/
         /////////////////////////////////////////////////////////////////////////////
-   */
+
     }
 
     public void simulateScaleValues(View view)
