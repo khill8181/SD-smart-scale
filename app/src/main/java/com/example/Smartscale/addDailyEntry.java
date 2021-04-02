@@ -131,9 +131,10 @@ public class addDailyEntry extends AppCompatActivity {
             units.setText(unitsString);
             unitToggle.setVisibility(View.GONE);
             tareButton.setVisibility(View.GONE);
+
             //buttonConnect.setVisibility(View.GONE);
         }
-        else    ETfoodQuantity.setEnabled(true);
+        else    disableEditText(ETfoodQuantity);
 
         ETfoodQuantity.addTextChangedListener(new TextWatcher() {
 
@@ -215,6 +216,8 @@ public class addDailyEntry extends AppCompatActivity {
         }
 
 
+
+
         // josh addition////////////////////////////////////////////////////////////
         //For Bluetooth Connectivity
         // If a bluetooth device has been selected from SelectDeviceActivity
@@ -225,14 +228,18 @@ public class addDailyEntry extends AppCompatActivity {
             // Get the device address to make BT Connection
             deviceAddress = btDetail.getString("btAddress", null);
             // Show progress and connection status
+
             //buttonConnect.setText("Connecting to " + deviceName + "...");
             //buttonConnect.setEnabled(false);
+
 
             /*
             This is the most important piece of code. When "deviceName" is found
             the code will call a new thread to create a bluetooth connection to the
             selected device (see the thread code below)
              */
+
+
 
             BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
             createConnectThread = new CreateConnectThread(bluetoothAdapter,deviceAddress, this);
@@ -246,7 +253,7 @@ public class addDailyEntry extends AppCompatActivity {
                     case CONNECTING_STATUS:
                         switch(msg.arg1){
                             case 1:
-                                ETfoodQuantity.setEnabled(false);
+                                disableEditText(ETfoodQuantity);
                                 //buttonConnect.setText("Weigh Mass");
                                 //buttonConnect.setEnabled(true);
                                 break;
@@ -261,8 +268,6 @@ public class addDailyEntry extends AppCompatActivity {
                         //buttonConnect.setEnabled(true);
                         if (msg.obj != null && !isCountEntry) {
                             btMass = msg.obj.toString();
-                            EditText editText;
-
                             if(btMass.charAt(btMass.length() - 2) == 'g') {
                                 unitsString = "g";
                                 units.setText("g");
@@ -272,6 +277,8 @@ public class addDailyEntry extends AppCompatActivity {
                                 units.setText("oz");
                             }
 
+                            EditText editText;
+
                             if (isCompleteDelayedMeasurement) {
                                 editText = (EditText) findViewById(R.id.massFromScale);
                             }
@@ -280,7 +287,7 @@ public class addDailyEntry extends AppCompatActivity {
                             }
 
                             editText.setText(btMass.substring(0, btMass.length() - 2));
-                            //ETfoodQuantity.setText(btMass.substring(0, btMass.length() - 2));
+                            //ETfoodQuantity.setText(btMass.substring(0, btMass.length() - 2))
                         }
 
                         break;
@@ -327,11 +334,10 @@ public class addDailyEntry extends AppCompatActivity {
         });
 
         /////////////////////////////////////////////////////////////////////////////
+
     }
 
-    public void setMassEditable () {
-        ETfoodQuantity.setEnabled(true);
-    }
+
 
     public void simulateScaleValues(View view)
     {
@@ -341,11 +347,8 @@ public class addDailyEntry extends AppCompatActivity {
     }
 
     private void disableEditText(EditText editText) {
-        editText.setFocusable(false);
+
         editText.setEnabled(false);
-        editText.setCursorVisible(false);
-        //editText.setKeyListener(null);
-        editText.setBackgroundColor(Color.TRANSPARENT);
         editText.setTextColor(Color.BLACK);
     }
 
@@ -361,7 +364,6 @@ public class addDailyEntry extends AppCompatActivity {
 
     public void proportionedEntry()
     {
-        //ETfoodQuantity.setText("0");
         food = proportionData.get(0);
         double mass = Double.parseDouble(proportionData.get(2));
         double calories = Double.parseDouble(proportionData.get(3));
@@ -432,19 +434,20 @@ public class addDailyEntry extends AppCompatActivity {
         tareButton.setVisibility(View.VISIBLE);
         proportionedEntry();
 
+        /*
         //final Button buttonConnect = findViewById(R.id.buttonConnect);
         // If a bluetooth device has been selected from SelectDeviceActivity
         SharedPreferences btDetail = getSharedPreferences("btDetail", MODE_PRIVATE);
         //deviceName = getIntent().getStringExtra("deviceName");
         deviceName = btDetail.getString("btName", null);
-        if (deviceName != null && !isCountEntry){
+        if (deviceName != null){
             deviceAddress = btDetail.getString("btAddress", null);
             //buttonConnect.setText("Connecting to " + deviceName + "...");
             //buttonConnect.setEnabled(false);
             BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
             createConnectThread = new CreateConnectThread(bluetoothAdapter,deviceAddress, this);
             createConnectThread.start();
-        }
+        }*/
     }
     /* ============================ Thread to Create Bluetooth Connection =================================== */
     public static class CreateConnectThread extends Thread {

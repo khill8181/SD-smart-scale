@@ -1,17 +1,20 @@
 package com.example.Smartscale;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.CursorAdapter;
 import android.widget.TextView;
 
 public class foodLogAdapter extends CursorAdapter {
 
     private Listener listener;
+    Button buttonOfOrigin;
 
     interface Listener {
         void onClickCustom(int id);
@@ -42,7 +45,12 @@ public class foodLogAdapter extends CursorAdapter {
         //TextView mass = (TextView) view.findViewById(R.id.mass);
         String foodString = cursor.getString(cursor.getColumnIndex("food"));
         String caloriesString = String.format("%.1f", cursor.getDouble(cursor.getColumnIndex("calories")));
-        String massUnit = cursor.getString(cursor.getColumnIndex("massUnit"));
+
+        Activity activity = (Activity) context;
+        String massUnit;
+        if (activity instanceof chooseFood) massUnit = "g";
+        else massUnit = cursor.getString(cursor.getColumnIndex("massUnit"));
+
         String massString = String.format("%.1f", cursor.getDouble(cursor.getColumnIndex("mass")));
         if(massUnit.contentEquals("")) massString = massString.substring(0,massString.indexOf('.'));
         int id = cursor.getInt(0);

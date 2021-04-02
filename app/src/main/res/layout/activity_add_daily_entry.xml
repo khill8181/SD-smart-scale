@@ -59,7 +59,8 @@
                 android:id="@+id/massFromScale"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:enabled="true"
+                android:enabled="false"
+                android:textColor="@color/black"
                 android:hint="Mass from scale"
                 android:textSize="30sp"
                 android:inputType="textPersonName" />
