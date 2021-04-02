@@ -41,12 +41,36 @@
                 app:srcCompat="@drawable/ic_search_black_24dp" />
         </LinearLayout>
 
-        <Button
-            android:id="@+id/addPropComboButton"
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:onClick="proportionedFoodSelection"
-            android:text="Add proportioned combo" />
+            android:orientation="horizontal"
+            android:id="@+id/specialEntryLayout">
+
+            <Button
+                android:id="@+id/addPropComboButton"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:onClick="proportionedFoodSelection"
+                android:text="Combo" />
+
+            <Button
+                android:id="@+id/addByCountBttn"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:onClick="listCountableFoods"
+                android:text="Count" />
+
+            <Button
+                android:id="@+id/button11"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Meal"
+                android:onClick="addMeal"/>
+        </LinearLayout>
 
         <Button
             android:id="@+id/submitCombo"
@@ -54,13 +78,6 @@
             android:layout_height="wrap_content"
             android:onClick="submitSelections"
             android:text="Submit combo" />
-
-        <Button
-            android:id="@+id/addByCountBttn"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:onClick="listCountableFoods"
-            android:text="Add by count" />
 
         <TextView
             android:id="@+id/noResultsView"

@@ -16,8 +16,20 @@
         android:title="@string/connect_scale"
         app:showAsAction="never" />
     <item
-        android:id="@+id/addFoodMenuItem"
+        android:id="@+id/saveMealMenuItem"
         android:orderInCategory="201"
+        android:title="Save Meal" />
+    <item
+        android:id="@+id/addFoodMenuItem"
+        android:orderInCategory="202"
         android:title="Add Food" />
+    <item
+        android:id="@+id/beginDelayedMI"
+        android:orderInCategory="203"
+        android:title="Begin delayed"/>
+    <item
+        android:id="@+id/completeDelayedMI"
+        android:orderInCategory="204"
+        android:title="Complete delayed" />
 
 </menu>

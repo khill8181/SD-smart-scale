@@ -47,6 +47,7 @@ public class chooseFood extends AppCompatActivity {
     static boolean onMainPage = true;
     Intent oldIntent;
     boolean isBeginDelayedMeasurement;
+    LinearLayout specialEntryLayout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,18 +63,14 @@ public class chooseFood extends AppCompatActivity {
         submitFoodChoices = (Button) findViewById(R.id.submitCombo);
         addByCountBttn = findViewById(R.id.addByCountBttn);
         searchBarLayout = findViewById(R.id.searchBarLayout);
+        specialEntryLayout = findViewById(R.id.specialEntryLayout);
         submitFoodChoices.setVisibility(View.GONE);
         list = (ListView) findViewById(R.id.foodList);
 
-        if(isBeginDelayedMeasurement) {addByCountBttn.setVisibility(View.GONE);addPropComboBttn.setVisibility(View.GONE);}
+        if(isBeginDelayedMeasurement) specialEntryLayout.setVisibility(View.GONE);
 
         SQLiteOpenHelper smartscaleDBHelper = new SmartscaleDatabaseHelper(this);
         db = smartscaleDBHelper.getReadableDatabase();
-        //messing around with stupid blinking cursor
-        searchedTermView.setOnFocusChangeListener(new View.OnFocusChangeListener() {
-            @Override
-            public void onFocusChange(View v, boolean hasFocus) {
-                if (!hasFocus) searchedTermView.clearFocus();}});
 
         cursor = db.query("Foodlist", new String[] {"_id","food",
                 "mass", "calories", "count"},null,null,null,null,null);
@@ -95,8 +92,7 @@ public class chooseFood extends AppCompatActivity {
     {
         onMainPage = false;
         searchBarLayout.setVisibility(View.GONE);
-        addByCountBttn.setVisibility(View.GONE);
-        addPropComboBttn.setVisibility(View.GONE);
+        specialEntryLayout.setVisibility(View.GONE);
         list.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
         submitFoodChoices.setVisibility(view.VISIBLE);
         ids = new ArrayList<Integer>();
@@ -155,8 +151,7 @@ public class chooseFood extends AppCompatActivity {
     public void listCountableFoods(View view){
         onMainPage = false;
         searchBarLayout.setVisibility(View.GONE);
-        addPropComboBttn.setVisibility(View.GONE);
-        addByCountBttn.setVisibility(View.GONE);
+        specialEntryLayout.setVisibility(View.GONE);
         Cursor newCursor = db.query("Foodlist", new String[] {"_id","food",
                 "mass", "calories", "count"},"count != ? ",new String[]{"0"},null,null,null);
         adapter.changeCursor(newCursor);
@@ -176,8 +171,7 @@ public class chooseFood extends AppCompatActivity {
         searchedTerm = searchedTermView.getText().toString();
         if(searchedTerm.contentEquals("")) return;
         onMainPage = false;
-        addPropComboBttn.setVisibility(View.GONE);
-        addByCountBttn.setVisibility(View.GONE);
+        specialEntryLayout.setVisibility(View.GONE);
         searchResults = new ArrayList<webAPIFood>();
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl("https://trackapi.nutritionix.com/")
@@ -256,6 +250,10 @@ public class chooseFood extends AppCompatActivity {
 
     }
 
-
+    public void addMeal(View view)
+    {
+        Intent intent = new Intent(this, selectMealToAdd.class);
+        startActivity(intent);
+    }
 
 }
