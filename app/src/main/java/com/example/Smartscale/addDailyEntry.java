@@ -221,7 +221,7 @@ public class addDailyEntry extends AppCompatActivity {
         SharedPreferences btDetail = getSharedPreferences("btDetail", MODE_PRIVATE);
         //deviceName = getIntent().getStringExtra("deviceName");
         deviceName = btDetail.getString("btName", null);
-        if (deviceName != null && !isCountEntry){
+        if (deviceName != null){
             // Get the device address to make BT Connection
             deviceAddress = btDetail.getString("btAddress", null);
             // Show progress and connection status
@@ -259,9 +259,18 @@ public class addDailyEntry extends AppCompatActivity {
                     case MESSAGE_READ:
                         //buttonConnect.setText("Weigh Mass");
                         //buttonConnect.setEnabled(true);
-                        if (msg.obj != null) {
+                        if (msg.obj != null && !isCountEntry) {
                             btMass = msg.obj.toString();
                             EditText editText;
+
+                            if(btMass.charAt(btMass.length() - 2) == 'g') {
+                                unitsString = "g";
+                                units.setText("g");
+                            }
+                            else {
+                                unitsString = "oz";
+                                units.setText("oz");
+                            }
 
                             if (isCompleteDelayedMeasurement) {
                                 editText = (EditText) findViewById(R.id.massFromScale);
@@ -270,8 +279,8 @@ public class addDailyEntry extends AppCompatActivity {
                                 editText = (EditText) findViewById(R.id.ETfoodQuantity);
                             }
 
-                            editText.setText(btMass);
-                            ETfoodQuantity.setText(btMass);
+                            editText.setText(btMass.substring(0, btMass.length() - 2));
+                            //ETfoodQuantity.setText(btMass.substring(0, btMass.length() - 2));
                         }
 
                         break;
@@ -301,11 +310,17 @@ public class addDailyEntry extends AppCompatActivity {
         unitToggle.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (mmSocket != null)
+                if (connectedThread != null) //(mmSocket != null)
                     connectedThread.write("u");
-                if(unitsString.contentEquals("g")) {units.setText("oz"); unitsString = "oz";}
-                else {units.setText("g"); unitsString = "g";}
-
+                else {//if (CONNECTING_STATUS == -1) {
+                    if (unitsString.contentEquals("g")) {
+                        units.setText("oz");
+                        unitsString = "oz";
+                    } else {
+                        units.setText("g");
+                        unitsString = "g";
+                    }
+                }
                 if(ETfoodQuantity.getText().toString().contentEquals("")) emptyEntryMass = true;
                 calcCalories();
             }
