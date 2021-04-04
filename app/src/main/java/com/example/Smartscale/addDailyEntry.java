@@ -32,6 +32,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import org.w3c.dom.Text;
 
@@ -45,13 +46,14 @@ public class addDailyEntry extends AppCompatActivity {
     boolean isCountEntry;
     boolean isCompleteDelayedMeasurement;
     boolean isBeginDelayedMeasurement;
+    boolean isRecipeItem;
+    boolean isRecipeFinalMass;
     //general variables
     double calMassRatioG;
     double calCountRatio;
     SQLiteOpenHelper smartscaleDBHelper = new SmartscaleDatabaseHelper(this);
     SQLiteDatabase db;
     String food;
-    String strEntryCalories;
     SharedPreferences sharedPreferences;
     double currentCalLeft;
     TextView calLeft;
@@ -95,28 +97,40 @@ public class addDailyEntry extends AppCompatActivity {
         LinearLayout proportionView = findViewById(R.id.proportionView);
         calories = findViewById(R.id.calcCalories);
         units = findViewById(R.id.units);
+        Button addEntryBttn = findViewById(R.id.addEntryBttn);
         tareButton = findViewById(R.id.tareButton);
         //final Button buttonConnect = findViewById(R.id.buttonConnect);
         unitsString = units.getText().toString();//defaults to "g"
         intent = getIntent();
         unitToggle = findViewById(R.id.unitToggle);
+        dbText = (TextView) findViewById(R.id.foodName);
         sharedPreferences = getSharedPreferences("MyPREFERENCES", Context.MODE_PRIVATE);
         focusedDate = sharedPreferences.getString("focusedDate","string");
         LinearLayout massFromScaleLayout = findViewById(R.id.massFromScaleLayout);
         LinearLayout calorieLayout = findViewById(R.id.calorieLayout);
+        LinearLayout recipeItemBttnLayout = findViewById(R.id.recipeItemButtonLayout);
+        LinearLayout recipeETLayout = findViewById(R.id.recipeETLayout);
+        LinearLayout caloriesLeftLayout = findViewById(R.id.caloriesLeftLayout);
 
 
         isCompleteDelayedMeasurement = intent.getBooleanExtra("isCompleteDelayedMeasurement",false);
         isBeginDelayedMeasurement = intent.getBooleanExtra("isBeginDelayedMeasurement",false);
+        isRecipeItem = intent.getBooleanExtra("isRecipeItem",false);
+        isRecipeFinalMass = intent.getBooleanExtra("isRecipeFinalMass",false);
 
         if(!isCompleteDelayedMeasurement) massFromScaleLayout.setVisibility(View.GONE);
         if(isBeginDelayedMeasurement) calorieLayout.setVisibility(View.GONE);
+
+        if(isRecipeFinalMass){calorieLayout.setVisibility(View.GONE);dbText.setVisibility(View.GONE);}
+        else recipeETLayout.setVisibility(View.GONE);
+
+        if(isRecipeItem) {addEntryBttn.setVisibility(View.GONE);caloriesLeftLayout.setVisibility(View.GONE);}
+        else recipeItemBttnLayout.setVisibility(View.GONE);
 
         isProportionEntry = intent.getBooleanExtra("isProportionEntry", false);
         isCountEntry = intent.getBooleanExtra("isCountEntry",false);
         TextView propEntryText = (TextView) findViewById(R.id.propEntryText);
         propEntryValue = (TextView) findViewById(R.id.propEntryValue);
-        dbText = (TextView) findViewById(R.id.foodName);
         calLeft = (TextView) findViewById(R.id.calLeftAddingEntry);
         massFromScale = findViewById(R.id.massFromScale);
         ETfoodQuantity = findViewById(R.id.ETfoodQuantity);
@@ -388,6 +402,28 @@ public class addDailyEntry extends AppCompatActivity {
         emptyEntryMass = false;
     }
 
+    public void addAnotherItemToRecipe(View view)
+    {
+        float currentCalorieTotal = sharedPreferences.getFloat("recipeCalorieTotal",0);
+        currentCalorieTotal += entryCalories;
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putFloat("recipeCalorieTotal",currentCalorieTotal); editor.commit();
+        Intent intent = new Intent(this,chooseFood.class);
+        intent.putExtra("isRecipeItem",true);
+        startActivity(intent);
+    }
+
+    public void getRecipeFinalMass(View view)
+    {
+        float currentCalorieTotal = sharedPreferences.getFloat("recipeCalorieTotal",0);
+        currentCalorieTotal += entryCalories;
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putFloat("recipeCalorieTotal",currentCalorieTotal); editor.commit();
+        Intent intent = new Intent(this,addDailyEntry.class);
+        intent.putExtra("isRecipeFinalMass",true);
+        startActivity(intent);
+    }
+
     public void insertDailyEntry(View view)
     {
         String mealTime = sharedPreferences.getString("mealTime","string");
@@ -398,8 +434,33 @@ public class addDailyEntry extends AppCompatActivity {
             Intent newIntent = new Intent(this, MainActivity.class);
             startActivity(newIntent);
         }
+        else if(isRecipeFinalMass)
+        {
+            int count = 0;
+            String recipeName = ((EditText)findViewById(R.id.recipeNameET)).getText().toString();
+            String recipeCount = ((EditText)findViewById(R.id.recipeCountET)).getText().toString();
+            if (!recipeCount.contentEquals("")) count = Integer.parseInt(recipeCount);
+            if (recipeName.contentEquals(""))
+            {
+                Context context = getApplicationContext();
+                CharSequence text = "A recipe name must be provided to store this new food";
+                int duration = Toast.LENGTH_SHORT;
+                Toast toast = Toast.makeText(context, text, duration);
+                toast.show();
+            }
+            else
+            {
+                int calories = (int)sharedPreferences.getFloat("recipeCalorieTotal",0);
+                SmartscaleDatabaseHelper.insertNewFood(db,recipeName,entryMass,calories,count);
+                Context context = getApplicationContext();
+                CharSequence text = "Food added";
+                int duration = Toast.LENGTH_SHORT;
+                Toast toast = Toast.makeText(context, text, duration);
+                toast.show();
+                startActivity(new Intent(this,MainActivity.class));
+            }
+        }
         else {
-            strEntryCalories = String.format("%.1f", Double.parseDouble(calories.getText().toString()));
             ContentValues contentValues = new ContentValues();
             contentValues.put("calConsumed", calConsumedToday + entryCalories);
             db.update("calories", contentValues, "date=?", new String[]{focusedDate});
@@ -591,15 +652,21 @@ public class addDailyEntry extends AppCompatActivity {
     }
 
     /* ============================ Terminate Connection at BackPress ====================== */
-    //@Override
-   /* public void onBackPressed() {
-        // Terminate Bluetooth Connection and close app
+    @Override
+    public void onBackPressed() {
+
+    /*    // Terminate Bluetooth Connection and close app
         if (createConnectThread != null) {
             createConnectThread.cancel();
         }
         Intent a = new Intent(Intent.ACTION_MAIN);
         a.addCategory(Intent.CATEGORY_HOME);
         a.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        startActivity(a);
-    }*/
+        startActivity(a);*/
+        if(isRecipeFinalMass)
+            {cancelNewRecipeDialogFragment cancelRecipe = new cancelNewRecipeDialogFragment();
+            cancelRecipe.show(getSupportFragmentManager(),"cancel recipe");}
+        else
+            super.onBackPressed();
+    }
 }

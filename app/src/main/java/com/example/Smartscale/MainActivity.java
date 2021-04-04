@@ -175,24 +175,16 @@ public class MainActivity extends AppCompatActivity
 
             Toast toast = Toast.makeText(context, text, duration);
             toast.show();
-
-
-
         }
-
-        //test current date and past dates
 
         //no entries to be saved
         else {
             Context context = getApplicationContext();
             CharSequence text = "No entries to add";
             int duration = Toast.LENGTH_SHORT;
-
             Toast toast = Toast.makeText(context, text, duration);
             toast.show();
         }
-
-        //SmartscaleDatabaseHelper.insertSavedMealEntry(db,);
     }
 
     static public Calendar parseDateStringToCalendar(String dateString)
@@ -268,6 +260,14 @@ public class MainActivity extends AppCompatActivity
             displayDate(focusedDate);
             setCalGoalAndLeft(focusedDate);
             editor.commit();
+        }
+        else
+        {
+            Context context = getApplicationContext();
+            CharSequence text = "This is the oldest date available";
+            int duration = Toast.LENGTH_SHORT;
+            Toast toast = Toast.makeText(context, text, duration);
+            toast.show();
         }
     }
 
@@ -352,8 +352,8 @@ public class MainActivity extends AppCompatActivity
             return true;
         }
         else if(id == R.id.saveMealMenuItem) {
-            nameNewMealDialogFragment testing = new nameNewMealDialogFragment();
-            testing.show(getSupportFragmentManager(),"testing");
+            nameNewMealDialogFragment nameMeal = new nameNewMealDialogFragment();
+            nameMeal.show(getSupportFragmentManager(),"name meal");
         }
         else if(id == R.id.beginDelayedMI){
             Intent intent = new Intent(MainActivity.this, chooseFood.class);
@@ -370,5 +370,8 @@ public class MainActivity extends AppCompatActivity
         return super.onOptionsItemSelected(item);
     }
 
+    public void onBackPressed()
+    {
 
+    }
 }

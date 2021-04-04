@@ -47,6 +47,7 @@ public class chooseFood extends AppCompatActivity {
     static boolean onMainPage = true;
     Intent oldIntent;
     boolean isBeginDelayedMeasurement;
+    boolean isRecipeItem;
     LinearLayout specialEntryLayout;
 
     @Override
@@ -55,7 +56,9 @@ public class chooseFood extends AppCompatActivity {
         setContentView(R.layout.activity_choose_food2);
         oldIntent = getIntent();
         isBeginDelayedMeasurement = oldIntent.getBooleanExtra("isBeginDelayedMeasurement",false);
+        isRecipeItem = oldIntent.getBooleanExtra("isRecipeItem",false);
         onMainPage = true;
+        Button addMealBttn = findViewById(R.id.addMeal);
         addPropComboBttn = findViewById(R.id.addPropComboButton);
         noResultsView = findViewById(R.id.noResultsView);
         noResultsView.setVisibility(View.GONE);
@@ -68,6 +71,7 @@ public class chooseFood extends AppCompatActivity {
         list = (ListView) findViewById(R.id.foodList);
 
         if(isBeginDelayedMeasurement) specialEntryLayout.setVisibility(View.GONE);
+        if(isRecipeItem) {addMealBttn.setVisibility(View.GONE);addPropComboBttn.setVisibility(View.GONE);}
 
         SQLiteOpenHelper smartscaleDBHelper = new SmartscaleDatabaseHelper(this);
         db = smartscaleDBHelper.getReadableDatabase();
@@ -82,6 +86,7 @@ public class chooseFood extends AppCompatActivity {
                 Intent intent = new Intent(chooseFood.this, addDailyEntry.class);
                 intent.putExtra("id", (int) id);
                 intent.putExtra("isBeginDelayedMeasurement",isBeginDelayedMeasurement);
+                intent.putExtra("isRecipeItem",isRecipeItem);
                 startActivity(intent);
             }
         });
@@ -139,7 +144,12 @@ public class chooseFood extends AppCompatActivity {
 
     public void onBackPressed()
     {
-        if(onMainPage){
+        if(onMainPage && isRecipeItem) {
+            cancelNewRecipeDialogFragment cancelRecipe = new cancelNewRecipeDialogFragment();
+            cancelRecipe.show(getSupportFragmentManager(),"cancel recipe");
+        }
+        else if(onMainPage)
+        {
             Intent newIntent = new Intent(this,MainActivity.class);
             startActivity(newIntent);
         }
@@ -161,6 +171,7 @@ public class chooseFood extends AppCompatActivity {
                 Intent intent = new Intent(chooseFood.this, addDailyEntry.class);
                 intent.putExtra("id", (int) id);
                 intent.putExtra("isCountEntry", true);
+                intent.putExtra("isRecipeItem",isRecipeItem);
                 startActivity(intent);
             }
         });
@@ -233,6 +244,7 @@ public class chooseFood extends AppCompatActivity {
                                     Intent intent = new Intent(chooseFood.this, addDailyEntry.class);
                                     intent.putExtra("id", (int) dbID);
                                     intent.putExtra("isBeginDelayedMeasurement",isBeginDelayedMeasurement);
+                                    intent.putExtra("isRecipeItem",isRecipeItem);
                                     startActivity(intent);
                                 }
                             };
