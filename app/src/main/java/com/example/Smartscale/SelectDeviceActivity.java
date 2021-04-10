@@ -7,6 +7,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 
@@ -53,5 +54,10 @@ public class SelectDeviceActivity extends AppCompatActivity {
             snackbar.show();
         }
 
+    }
+
+    public void goToMain(View view)
+    {
+        startActivity(new Intent(this,MainActivity.class));
     }
 }

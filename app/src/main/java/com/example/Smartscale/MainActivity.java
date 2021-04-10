@@ -136,6 +136,16 @@ public class MainActivity extends AppCompatActivity
         breakfastEntry.setOnLongClickListener(longClickListener);*/
         //dinnerEntry.setOnLongClickListener(longClickListener);
 
+        View.OnLongClickListener longClickListener = new View.OnLongClickListener(){
+            @Override
+            public boolean onLongClick(View view){
+                pencilDailyEntryDialogFragment pencilDailyEntryDialogFragment = new pencilDailyEntryDialogFragment();
+                pencilDailyEntryDialogFragment.show(getSupportFragmentManager(),"pencil in");
+                return true;
+            }
+        };
+        findViewById(R.id.addDailyEntry).setOnLongClickListener(longClickListener);
+
         //// Open Bluetooth for the first time
         Boolean isFirstRun = getSharedPreferences("PREFERENCE", MODE_PRIVATE)
                 .getBoolean("isFirstRun", true);

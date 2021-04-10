@@ -148,14 +148,20 @@ public class chooseFood extends AppCompatActivity {
             cancelNewRecipeDialogFragment cancelRecipe = new cancelNewRecipeDialogFragment();
             cancelRecipe.show(getSupportFragmentManager(),"cancel recipe");
         }
+        else if(!onMainPage && isRecipeItem)
+        {
+            Intent newIntent = new Intent(this,chooseFood.class);
+            newIntent.putExtra("isRecipeItem",true);
+            startActivity(newIntent);
+        }
         else if(onMainPage)
         {
             Intent newIntent = new Intent(this,MainActivity.class);
             startActivity(newIntent);
         }
         else
-        {Intent newIntent = new Intent(this,chooseFood.class);
-        startActivity(newIntent);}
+            {Intent newIntent = new Intent(this,chooseFood.class);
+            startActivity(newIntent);}
     }
 
     public void listCountableFoods(View view){
