@@ -42,6 +42,12 @@
                 android:text="Button" />
         </LinearLayout>
 
+        <Button
+            android:id="@+id/connectButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Button" />
+
         <TextView
             android:id="@+id/foodName"
             android:layout_width="match_parent"
@@ -57,13 +63,13 @@
 
             <EditText
                 android:id="@+id/massFromScale"
-                android:layout_width="wrap_content"
+                android:layout_width="324dp"
                 android:layout_height="wrap_content"
                 android:enabled="false"
-                android:textColor="@color/black"
                 android:hint="Mass from scale"
-                android:textSize="30sp"
-                android:inputType="textPersonName" />
+                android:inputType="textPersonName"
+                android:textColor="@color/black"
+                android:textSize="30sp" />
 
 
         </LinearLayout>
