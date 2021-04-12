@@ -366,6 +366,9 @@ public class MainActivity extends AppCompatActivity
         else if(id == R.id.completeDelayedMI){
             startActivity(new Intent(MainActivity.this, completeDelayedMeas.class));
         }
+        else if(id == R.id.addExercise){
+            startActivity(new Intent(MainActivity.this, chooseExercise.class));
+        }
 
         return super.onOptionsItemSelected(item);
     }
