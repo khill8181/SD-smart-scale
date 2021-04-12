@@ -5,6 +5,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
+import android.content.BroadcastReceiver;
+import android.content.IntentFilter;
 import android.graphics.Color;
 import android.os.Handler;
 import android.os.Looper;
@@ -88,6 +90,7 @@ public class addDailyEntry extends AppCompatActivity {
     public static CreateConnectThread createConnectThread;
     private final static int CONNECTING_STATUS = 1; // used in bluetooth handler to identify message status
     private final static int MESSAGE_READ = 2; // used in bluetooth handler to identify message update
+    boolean isConnected = false;
     String btMass;
 
     @Override
@@ -99,7 +102,7 @@ public class addDailyEntry extends AppCompatActivity {
         units = findViewById(R.id.units);
         Button addEntryBttn = findViewById(R.id.addEntryBttn);
         tareButton = findViewById(R.id.tareButton);
-        //final Button buttonConnect = findViewById(R.id.buttonConnect);
+        final Button buttonConnect = findViewById(R.id.connectButton);
         unitsString = units.getText().toString();//defaults to "g"
         intent = getIntent();
         unitToggle = findViewById(R.id.unitToggle);
@@ -145,8 +148,7 @@ public class addDailyEntry extends AppCompatActivity {
             units.setText(unitsString);
             unitToggle.setVisibility(View.GONE);
             tareButton.setVisibility(View.GONE);
-
-            //buttonConnect.setVisibility(View.GONE);
+            buttonConnect.setVisibility(View.GONE);
         }
         else    disableEditText(ETfoodQuantity);
 
@@ -182,6 +184,8 @@ public class addDailyEntry extends AppCompatActivity {
             @Override
             public void onTextChanged(CharSequence s, int start,
                                       int before, int count) {
+                String mass = massFromScale.getText().toString();
+                if (mass.isEmpty() || mass.equals(".")) return;
                 calculatedMassMeasurement = delayedMeasurementInitialValue - Double.parseDouble(massFromScale.getText().toString());
                 ETfoodQuantity.setText(String.format("%.1f", calculatedMassMeasurement));
                     }
@@ -243,8 +247,8 @@ public class addDailyEntry extends AppCompatActivity {
             deviceAddress = btDetail.getString("btAddress", null);
             // Show progress and connection status
 
-            //buttonConnect.setText("Connecting to " + deviceName + "...");
-            //buttonConnect.setEnabled(false);
+            buttonConnect.setText("Connecting to " + deviceName + "...");
+            buttonConnect.setEnabled(false);
 
 
             /*
@@ -268,13 +272,15 @@ public class addDailyEntry extends AppCompatActivity {
                         switch(msg.arg1){
                             case 1:
                                 disableEditText(ETfoodQuantity);
-                                //buttonConnect.setText("Weigh Mass");
                                 //buttonConnect.setEnabled(true);
                                 break;
                             case -1:
-                                ETfoodQuantity.setEnabled(true);
-                                //buttonConnect.setText("Connect Scale");
-                                //buttonConnect.setEnabled(true);
+                                if (isCompleteDelayedMeasurement)
+                                    massFromScale.setEnabled(true);
+                                else
+                                    ETfoodQuantity.setEnabled(true);
+                                buttonConnect.setEnabled(true);
+                                buttonConnect.setText("Connect scale");
                                 break;
                         }
                     case MESSAGE_READ:
@@ -299,7 +305,8 @@ public class addDailyEntry extends AppCompatActivity {
                             else {
                                 editText = (EditText) findViewById(R.id.ETfoodQuantity);
                             }
-
+                            buttonConnect.setText("Connected");
+                            buttonConnect.setEnabled(false);
                             editText.setText(btMass.substring(0, btMass.length() - 2));
                             //ETfoodQuantity.setText(btMass.substring(0, btMass.length() - 2))
                         }
@@ -308,7 +315,7 @@ public class addDailyEntry extends AppCompatActivity {
                 }
             }
         };
-        /*buttonConnect.setOnClickListener(new View.OnClickListener() {
+        buttonConnect.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 // Move to adapter list
@@ -316,22 +323,24 @@ public class addDailyEntry extends AppCompatActivity {
                     Intent intent = new Intent(addDailyEntry.this, SelectDeviceActivity.class);
                     startActivity(intent);
                 }
-                else if (mmSocket != null){
-                    connectedThread.write("r");
+                else if (isConnected == false){
+                    BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+                    createConnectThread = new CreateConnectThread(bluetoothAdapter, deviceAddress, addDailyEntry.this);
+                    createConnectThread.start();
                 }
             }
-        });*/
+        });
         tareButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (mmSocket != null)
+                if (mmSocket != null && isConnected)
                     connectedThread.write("t");
             }
         });
         unitToggle.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (connectedThread != null) //(mmSocket != null)
+                if (isConnected == true) //(mmSocket != null)
                     connectedThread.write("u");
                 else {//if (CONNECTING_STATUS == -1) {
                     if (unitsString.contentEquals("g")) {
@@ -349,6 +358,39 @@ public class addDailyEntry extends AppCompatActivity {
 
         /////////////////////////////////////////////////////////////////////////////
 
+        BroadcastReceiver mReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                String action = intent.getAction();
+                BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
+
+                if (BluetoothDevice.ACTION_ACL_DISCONNECTED.equals(action)) {
+                    isConnected = false;
+                    if (isCompleteDelayedMeasurement)
+                        massFromScale.setEnabled(true);
+                    else
+                        ETfoodQuantity.setEnabled(true);
+                    buttonConnect.setText("Connect Scale");
+                    buttonConnect.setEnabled(true);
+                    Log.e("Bluetooth", "lost connection to scale");
+                }
+                else if (BluetoothDevice.ACTION_ACL_CONNECTED.equals(action)) {
+
+                    isConnected = true;
+                    if (isCompleteDelayedMeasurement)
+                        massFromScale.setEnabled(false);
+                    else
+                        ETfoodQuantity.setEnabled(false);
+                    buttonConnect.setText("Connected");
+                    buttonConnect.setEnabled(false);
+                }
+            }
+        };
+
+        IntentFilter filter1 = new IntentFilter(BluetoothDevice.ACTION_ACL_DISCONNECTED);
+        IntentFilter filter2 = new IntentFilter(BluetoothDevice.ACTION_ACL_CONNECTED);
+        this.registerReceiver(mReceiver, filter1);
+        this.registerReceiver(mReceiver, filter2);
     }
 
 
@@ -550,6 +592,7 @@ public class addDailyEntry extends AppCompatActivity {
                 mmSocket.connect();
                 Log.e("Status", "Device connected");
                 handler.obtainMessage(CONNECTING_STATUS, 1, -1).sendToTarget();
+                this.parent.isConnected = true;
             } catch (IOException connectException) {
                 // Unable to connect; close the socket and return.
                 try {
