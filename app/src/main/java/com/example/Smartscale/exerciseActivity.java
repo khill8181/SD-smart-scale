@@ -1,7 +1,13 @@
 package com.example.Smartscale;
 
 import android.app.Activity;
+import android.content.ContentValues;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteOpenHelper;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.TextView;
@@ -9,14 +15,28 @@ import android.widget.EditText;
 import static com.example.Smartscale.exercise.*;
 
 
+
 public class exerciseActivity extends Activity {
+    SQLiteOpenHelper smartscaleDBHelper = new SmartscaleDatabaseHelper(this);
+    SQLiteDatabase db;
+    SharedPreferences sharedPreferences;
+    String focusedDate;
+    double calConsumedToday;
+    int calGoal;
+
+
     public static final String EXTRA_EXERCISEID = "exerciseId";
     int exerciseId;
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_exercise);
         TextView name = (TextView) findViewById(R.id.title);
+
+        sharedPreferences = getSharedPreferences("MyPREFERENCES", Context.MODE_PRIVATE);
+        focusedDate = sharedPreferences.getString("focusedDate","string");
 
         exerciseId = (Integer)getIntent().getExtras().get(EXTRA_EXERCISEID);
         exercise exercise = exercises[exerciseId];
@@ -25,7 +45,19 @@ public class exerciseActivity extends Activity {
     public void submitCaloriesBurned(View view){
         Intent intent = new Intent(this, MainActivity.class);
         EditText calories = (EditText) findViewById(R.id.calories);
+        EditText duration = (EditText) findViewById(R.id.durationEditText);
+        int calGoal = Integer.parseInt(calories.getText().toString());
 
+        Cursor calConsumedCursor = db.query("calories", new String[] {"calGoal","calConsumed"},"date = ?",
+                new String [] {focusedDate},null,null,null);
+        calConsumedCursor.moveToFirst();
+        calGoal = calConsumedCursor.getInt(0);
+        calConsumedToday = calConsumedCursor.getDouble(1);
+        ContentValues contentValues = new ContentValues();
+        contentValues.put("calConsumed", calConsumedToday - 100);
+        db.update("calories", contentValues, "date=?", new String[]{focusedDate});
+        SmartscaleDatabaseHelper.insertEntry(db, "Running", focusedDate, 10.0, "Min", -100,"breakfast");
+        startActivity(intent);
 
     }
     public void calcCalories(View view){
