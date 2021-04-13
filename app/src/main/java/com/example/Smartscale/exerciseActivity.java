@@ -12,6 +12,10 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.EditText;
+import android.widget.Toast;
+
+import org.w3c.dom.Text;
+
 import static com.example.Smartscale.exercise.*;
 
 
@@ -37,6 +41,7 @@ public class exerciseActivity extends Activity {
 
         sharedPreferences = getSharedPreferences("MyPREFERENCES", Context.MODE_PRIVATE);
         focusedDate = sharedPreferences.getString("focusedDate","string");
+        db = smartscaleDBHelper.getReadableDatabase();
 
         exerciseId = (Integer)getIntent().getExtras().get(EXTRA_EXERCISEID);
         exercise exercise = exercises[exerciseId];
@@ -46,19 +51,34 @@ public class exerciseActivity extends Activity {
         Intent intent = new Intent(this, MainActivity.class);
         EditText calories = (EditText) findViewById(R.id.calories);
         EditText duration = (EditText) findViewById(R.id.durationEditText);
-        int calGoal = Integer.parseInt(calories.getText().toString());
-
-        Cursor calConsumedCursor = db.query("calories", new String[] {"calGoal","calConsumed"},"date = ?",
-                new String [] {focusedDate},null,null,null);
-        calConsumedCursor.moveToFirst();
-        calGoal = calConsumedCursor.getInt(0);
-        calConsumedToday = calConsumedCursor.getDouble(1);
-        ContentValues contentValues = new ContentValues();
-        contentValues.put("calConsumed", calConsumedToday - 100);
-        db.update("calories", contentValues, "date=?", new String[]{focusedDate});
-        SmartscaleDatabaseHelper.insertEntry(db, "Running", focusedDate, 10.0, "Min", -100,"breakfast");
-        startActivity(intent);
-
+        TextView title = (TextView) findViewById(R.id.title);
+        String exerciseName = title.getText().toString();
+        if (calories.getText().toString().equals("") || duration.getText().toString().equals("")){
+            Context context = getApplicationContext();
+            CharSequence text = "Calories and Duration required";
+            int time = Toast.LENGTH_SHORT;
+            Toast toast = Toast.makeText(context, text, time);
+            toast.show();
+        }
+        if (!calories.getText().toString().equals("") && !duration.getText().toString().equals("")){
+            int calBurned = -1*Integer.parseInt(calories.getText().toString());
+            float dur = (float) Integer.parseInt(duration.getText().toString());
+            Cursor calConsumedCursor = db.query("calories", new String[] {"calGoal","calConsumed"},"date = ?",
+                    new String [] {focusedDate},null,null,null);
+            calConsumedCursor.moveToFirst();
+            calGoal = calConsumedCursor.getInt(0);
+            calConsumedToday = calConsumedCursor.getDouble(1);
+            ContentValues contentValues = new ContentValues();
+            contentValues.put("calConsumed", calConsumedToday + calBurned);
+            db.update("calories", contentValues, "date=?", new String[]{focusedDate});
+            SmartscaleDatabaseHelper.insertEntry(db, exerciseName, focusedDate, dur, "Min", calBurned ,"breakfast");
+            Context context = getApplicationContext();
+            CharSequence text = "Exercise added";
+            int time = Toast.LENGTH_SHORT;
+            Toast toast = Toast.makeText(context, text, time);
+            toast.show();
+            startActivity(intent);
+        }
     }
     public void calcCalories(View view){
         EditText calories = (EditText) findViewById(R.id.calories);
