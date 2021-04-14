@@ -31,5 +31,9 @@
         android:id="@+id/completeDelayedMI"
         android:orderInCategory="204"
         android:title="Complete delayed" />
+    <item
+        android:id="@+id/addExercise"
+        android:orderInCategory="205"
+        android:title="Add Exercise" />
 
 </menu>
