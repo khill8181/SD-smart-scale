@@ -307,6 +307,7 @@ public class addDailyEntry extends AppCompatActivity {
                             }
                             buttonConnect.setText("Connected");
                             buttonConnect.setEnabled(false);
+                            isConnected = true;
                             editText.setText(btMass.substring(0, btMass.length() - 2));
                             //ETfoodQuantity.setText(btMass.substring(0, btMass.length() - 2))
                         }

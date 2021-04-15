@@ -59,7 +59,14 @@
             android:id="@+id/massFromScaleLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal">
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/textView16"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Mass Remaining:" />
 
             <EditText
                 android:id="@+id/massFromScale"
@@ -68,8 +75,16 @@
                 android:enabled="false"
                 android:hint="Mass from scale"
                 android:inputType="textPersonName"
+                android:textAlignment="textEnd"
                 android:textColor="@color/black"
                 android:textSize="30sp" />
+
+            <TextView
+                android:id="@+id/textView17"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Mass Eaten:" />
 
 
         </LinearLayout>
