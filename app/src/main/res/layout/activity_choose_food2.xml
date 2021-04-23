@@ -80,10 +80,11 @@
             android:text="Submit combo" />
 
         <TextView
-            android:id="@+id/noResultsView"
+            android:id="@+id/chooseFoodTV"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="No results" />
+            android:text="No results"
+            android:textSize="24sp" />
 
         <ListView
             android:id="@+id/foodList"

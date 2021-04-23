@@ -13,16 +13,25 @@
         tools:layout_editor_absoluteX="144dp"
         tools:layout_editor_absoluteY="274dp">
 
-        <ListView
-            android:id="@+id/confirmAddMealList"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
-
         <Button
             android:id="@+id/button10"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:onClick="addMeal"
             android:text="Add meal" />
+
+        <TextView
+            android:id="@+id/textView18"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Foods in the meal:"
+            android:textSize="24sp" />
+
+        <ListView
+            android:id="@+id/confirmAddMealList"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+
     </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

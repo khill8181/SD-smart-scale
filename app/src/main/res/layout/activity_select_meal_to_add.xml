@@ -6,10 +6,29 @@
     android:layout_height="match_parent"
     tools:context=".selectMealToAdd">
 
-    <ListView
-        android:id="@+id/list"
+
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:layout_editor_absoluteX="239dp"
-        tools:layout_editor_absoluteY="251dp" />
+        android:orientation="vertical"
+        tools:layout_editor_absoluteX="221dp"
+        tools:layout_editor_absoluteY="290dp">
+
+        <TextView
+            android:id="@+id/textView20"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Choose a meal:"
+            android:textSize="24sp" />
+
+
+        <ListView
+            android:id="@+id/list"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:layout_editor_absoluteX="239dp" >
+        </ListView>
+
+    </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

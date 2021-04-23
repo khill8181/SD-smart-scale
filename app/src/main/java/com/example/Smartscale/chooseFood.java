@@ -40,7 +40,7 @@ public class chooseFood extends AppCompatActivity {
     EditText searchedTermView;
     ArrayList<webAPIFood> searchResults;
     boolean noResults = false;
-    TextView noResultsView;
+    TextView chooseFoodTV;
     Button addPropComboBttn;
     Button addByCountBttn;
     LinearLayout searchBarLayout;
@@ -60,8 +60,8 @@ public class chooseFood extends AppCompatActivity {
         onMainPage = true;
         Button addMealBttn = findViewById(R.id.addMeal);
         addPropComboBttn = findViewById(R.id.addPropComboButton);
-        noResultsView = findViewById(R.id.noResultsView);
-        noResultsView.setVisibility(View.GONE);
+        chooseFoodTV = findViewById(R.id.chooseFoodTV);
+        chooseFoodTV.setVisibility(View.GONE);
         searchedTermView = findViewById(R.id.searchBar);
         submitFoodChoices = (Button) findViewById(R.id.submitCombo);
         addByCountBttn = findViewById(R.id.addByCountBttn);
@@ -98,6 +98,7 @@ public class chooseFood extends AppCompatActivity {
         onMainPage = false;
         searchBarLayout.setVisibility(View.GONE);
         specialEntryLayout.setVisibility(View.GONE);
+        chooseFoodTV.setText("Choose the foods for your combo:"); chooseFoodTV.setVisibility(View.VISIBLE);
         list.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
         submitFoodChoices.setVisibility(view.VISIBLE);
         ids = new ArrayList<Integer>();
@@ -168,6 +169,7 @@ public class chooseFood extends AppCompatActivity {
         onMainPage = false;
         searchBarLayout.setVisibility(View.GONE);
         specialEntryLayout.setVisibility(View.GONE);
+        chooseFoodTV.setVisibility(View.VISIBLE); chooseFoodTV.setText("Choose a countable food:");
         Cursor newCursor = db.query("Foodlist", new String[] {"_id","food",
                 "mass", "calories", "count"},"count != ? ",new String[]{"0"},null,null,null);
         adapter.changeCursor(newCursor);
@@ -231,7 +233,7 @@ public class chooseFood extends AppCompatActivity {
                         //testing to see if any foods left
                         currentIndex = rawText.indexOf("food_name",currentIndex);
                     }
-                    if(noResults) noResultsView.setVisibility(View.VISIBLE);
+                    if(noResults) {chooseFoodTV.setVisibility(View.VISIBLE); chooseFoodTV.setText("No results");}
                     noResults = false;
                     webAPIFood[] array = new webAPIFood[searchResults.size()];
                     searchResults.toArray(array);
