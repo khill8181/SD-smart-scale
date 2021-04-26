@@ -80,6 +80,7 @@ public class addDailyEntry extends AppCompatActivity {
     Button unitToggle;
     boolean emptyEntryMass = false;
     Button tareButton;
+    LinearLayout proportionView;
 
     //bluetooth variables
     private String deviceName = null;
@@ -97,7 +98,7 @@ public class addDailyEntry extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_daily_entry);
-        LinearLayout proportionView = findViewById(R.id.proportionView);
+        proportionView = findViewById(R.id.proportionView);
         calories = findViewById(R.id.calcCalories);
         units = findViewById(R.id.units);
         Button addEntryBttn = findViewById(R.id.addEntryBttn);
@@ -231,6 +232,7 @@ public class addDailyEntry extends AppCompatActivity {
             calCountRatio = calories/count;
             proportionData = new ArrayList<String>();
             proportionData.add("token string for logic purposes in insertDailyEntry");
+            proportionView.setVisibility(View.GONE);
         }
 
 
@@ -536,7 +538,9 @@ public class addDailyEntry extends AppCompatActivity {
         disableEditText(ETfoodQuantity);
         unitToggle.setVisibility(View.VISIBLE);units.setVisibility(View.VISIBLE);
         tareButton.setVisibility(View.VISIBLE);
+        proportionView.setVisibility(View.VISIBLE);
         proportionedEntry();
+
 
         /*
         //final Button buttonConnect = findViewById(R.id.buttonConnect);

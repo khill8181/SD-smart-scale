@@ -13,6 +13,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.RadioButton;
+import android.widget.RadioGroup;
 import android.widget.Toast;
 
 import java.lang.Object;
@@ -50,7 +51,7 @@ public class calorieGoal extends AppCompatActivity {
         db.update("calories",contentValues,"date=?",new String[]{focusedDate});
         startActivity(intent);
     }
-
+/*
     public void onRadioButtonClicked(View view) {
         // Is the button now checked?
         boolean checked = ((RadioButton) view).isChecked();
@@ -80,12 +81,22 @@ public class calorieGoal extends AppCompatActivity {
                 if (checked) weightGoal = "maintain";
                 break;
         }
-    }
+    }*/
     public void calcCalories(View view) {
         EditText editText = (EditText) findViewById(R.id.editText2);
         EditText ageText = (EditText) findViewById(R.id.ageEditText);
         EditText weightText = (EditText) findViewById(R.id.weightEditText);
         EditText heightText = (EditText) findViewById(R.id.heightEditText);
+
+        RadioGroup sexRG = findViewById(R.id.sexRG);
+        if(sexRG.getCheckedRadioButtonId()==R.id.male) gender = "male";
+        else gender = "female";
+
+        RadioGroup goalRG = findViewById(R.id.goalRG);
+        if(goalRG.getCheckedRadioButtonId()==R.id.lose) weightGoal = "lose";
+        else if(goalRG.getCheckedRadioButtonId()==R.id.gain) weightGoal = "gain";
+        else weightGoal = "maintain";
+
         if(!ageText.getText().toString().equals("")&&
                 !weightText.getText().toString().equals("")&&
                 !heightText.getText().toString().equals("")&&
