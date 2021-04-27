@@ -75,7 +75,7 @@
                 android:layout_height="wrap_content"
                 android:enabled="false"
                 android:hint="Mass from scale"
-                android:inputType="textPersonName"
+                android:inputType="numberDecimal"
                 android:textAlignment="textEnd"
                 android:textColor="@color/black"
                 android:textSize="30sp" />

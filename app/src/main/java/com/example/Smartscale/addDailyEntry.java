@@ -123,8 +123,9 @@ public class addDailyEntry extends AppCompatActivity {
         isRecipeFinalMass = intent.getBooleanExtra("isRecipeFinalMass",false);
 
         if(!isCompleteDelayedMeasurement) massFromScaleLayout.setVisibility(View.GONE);
-        if(isBeginDelayedMeasurement) calorieLayout.setVisibility(View.GONE);
-
+        if(isBeginDelayedMeasurement) {
+            calorieLayout.setVisibility(View.GONE);
+        }
         if(isRecipeFinalMass){calorieLayout.setVisibility(View.GONE);dbText.setVisibility(View.GONE);}
         else recipeETLayout.setVisibility(View.GONE);
 
@@ -310,6 +311,7 @@ public class addDailyEntry extends AppCompatActivity {
                             buttonConnect.setText("Connected");
                             buttonConnect.setEnabled(false);
                             isConnected = true;
+                            if (isBeginDelayedMeasurement) ETfoodQuantity.setCursorVisible(false);
                             editText.setText(btMass.substring(0, btMass.length() - 2));
                             //ETfoodQuantity.setText(btMass.substring(0, btMass.length() - 2))
                         }
@@ -369,6 +371,7 @@ public class addDailyEntry extends AppCompatActivity {
 
                 if (BluetoothDevice.ACTION_ACL_DISCONNECTED.equals(action)) {
                     isConnected = false;
+                    if (isBeginDelayedMeasurement) ETfoodQuantity.setCursorVisible(true);
                     if (isCompleteDelayedMeasurement)
                         massFromScale.setEnabled(true);
                     else
@@ -380,6 +383,8 @@ public class addDailyEntry extends AppCompatActivity {
                 else if (BluetoothDevice.ACTION_ACL_CONNECTED.equals(action)) {
 
                     isConnected = true;
+                    if (isBeginDelayedMeasurement)
+                        ETfoodQuantity.setCursorVisible(false);
                     if (isCompleteDelayedMeasurement)
                         massFromScale.setEnabled(false);
                     else
